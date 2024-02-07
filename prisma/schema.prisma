@@ -9,3 +9,73 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+model Users {
+  id          Int       @id @default(autoincrement()) @map("id")
+  email       String    @unique @map("email")
+  password    String    @map("password")
+  name        String    @map("name")
+  interest    String    @map("interest") 
+  profileImage String?   @map("profileImage")
+
+  postId      Posts[]
+  Likes       Likes[]
+  CommunityUsers CommunityUsers[]
+
+  @@map("Users")
+}
+
+model Posts {
+  id        Int         @id @default(autoincrement()) @map("id")
+  userId    Int         @map("userId")
+  postId    Int         @map("postId")
+  communityId Int       @map("communityId")
+  title     String      @map("title")
+  content   String      @map("content")
+  createdAt DateTime    @default(now()) @map("createdAt")
+  updatedAt DateTime    @default(now()) @map("updatedAt")
+  isComment Boolean     @default(false) @map("isComment")
+
+  user Users @relation(fields:[userId], references: [id] , onDelete: Cascade)
+  community Community @relation(fields:[communityId], references: [id] , onDelete: Cascade)
+
+  Likes Likes[]
+
+  @@map("Posts")
+}
+
+model Community {
+  id        Int         @id @default(autoincrement()) @map("id")
+  postId    Int         @map("postId")
+  comName     String    @map("comName")
+  interest  String      @map("interest")
+
+  posts Posts[]
+  communityUsers CommunityUsers[]
+
+  @@map("Community")
+}
+
+model CommunityUsers {
+  id        Int         @id @default(autoincrement()) @map("id")
+  userId    Int         @map("userId")
+  communityId    Int    @map("communityId")
+
+  community Community @relation(fields:[communityId] , references: [id] , onDelete: Cascade)
+  users Users @relation(fields:[userId] , references: [id] , onDelete: Cascade)
+
+
+  @@map("CommunityUsers")
+}
+
+
+model Likes {
+  id        Int         @id @default(autoincrement()) @map("id")
+  userId    Int         @map("userId")
+  postId    Int         @map("postId")
+
+  users Users @relation(fields:[userId] , references: [id] , onDelete: Cascade)
+  posts Posts @relation(fields:[postId] , references: [id] , onDelete: Cascade)
+
+  @@map("Likes")
+}
