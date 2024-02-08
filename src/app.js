@@ -14,7 +14,6 @@ app.use(cookieParser());
 app.use(errorMiddleware);
 app.use("/api", [userRouter, community, postRouter, postlike]);
 
-
 app.listen(PORT, () => {
   console.log(PORT, "포트로 서버 오픈");
 });
