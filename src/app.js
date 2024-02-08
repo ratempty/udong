@@ -3,8 +3,8 @@ import cookieParser from "cookie-parser";
 import errorMiddleware from "./middleware/error.middleware.js";
 import community from "./routes/community.routes.js";
 import postlike from "./routes/postlike.js";
-import userRouter from "./routes/users.router.js";
-import postRouter from "./routes/posts.router.js";
+import userRouter from "./routes/users.routes.js";
+import postRouter from "./routes/posts.routes.js";
 
 const app = express();
 const PORT = 3000;
