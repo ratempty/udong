@@ -1,8 +1,7 @@
 import express from "express";
 import { prisma } from "../utils/index.js";
 import authMiddleware from "../middleware/auth.middleware.js";
-import jwt from 'jsonwebtoken';
-
+import jwt from "jsonwebtoken";
 
 const router = express.Router();
 
@@ -113,4 +112,3 @@ router.delete("/community/:postId", authMiddleware, async (req, res, next) => {
   });
   return res.status(204).json({ message: "삭제완료" });
 });
-
