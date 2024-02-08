@@ -100,7 +100,6 @@ router.patch(
 //localhost:3000/api/:communityId/:postId
 router.delete(
 	'/:communityId/:postId',
-	authMiddleware,
 	async (req, res, next) => {
 		const { communityId, postId } = req.params;
 		const { userId } = req.user;
@@ -179,6 +178,7 @@ router.post('/comment/:parentsId', async (req, res, next) => {
 				title: '댓글',
 				content,
 				isComment: true,
+                parentsId:+parentsId,
 			},
 		});
 
@@ -240,5 +240,40 @@ router.patch('/comment/:postId', async (req, res, next) => {
 /**
  * 댓글 조회
  */
+router.get('/comment/:parentsId', async (req, res, next) => {
+	const { orderKey, orderValue } = req.query;
+	const validOrderValue =
+		orderValue && orderValue.toUpperCase() === 'ASC' ? 'asc' : 'desc';
+    const { parentsId } = req.params;
+
+	try {
+		let query = {
+			select: {
+				content: true,
+				createdAt: true,
+				updatedAt: true,
+				user: {
+					select: {
+						name : true,
+					},
+				},
+			},
+            where : {
+                parentsId : +parentsId,
+                isComment : true,
+            },
+			orderBy: {
+				[orderKey || 'createdAt']: validOrderValue,
+			},
+		};
+
+		const comments = await prisma.posts.findMany(query);
+		return res.status(200).json({ data: comments });
+	} catch (error) {
+		return res
+			.status(500)
+			.json({ message: '서버 오류가 발생했습니다.', error: error.message });
+	}
+});
 
 export default router;
