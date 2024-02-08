@@ -28,7 +28,7 @@ model Users {
 model Posts {
   id        Int         @id @default(autoincrement()) @map("id")
   userId    Int         @map("userId")
-  postId    Int         @map("postId")
+  parentsId Int?        @map("postId")
   communityId Int       @map("communityId")
   title     String      @map("title")
   content   String      @map("content")
@@ -46,7 +46,6 @@ model Posts {
 
 model Community {
   id        Int         @id @default(autoincrement()) @map("id")
-  postId    Int         @map("postId")
   comName     String    @map("comName")
   interest  String      @map("interest")
 
