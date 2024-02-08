@@ -5,11 +5,11 @@ const router = express.Router();
 
 
 /**
- * 본인 프로필 조회
+ * 프로필 조회
  */
-router.get('/users', async (req, res, next) => {
+router.get('/users/:userId', async (req, res, next) => {
 	//const { userId } = req.user;
-	const { userId } = req.body;
+	const { userId } = req.params;
 
 	const user = await prisma.users.findFirst({
 		where: { id: +userId },
@@ -44,7 +44,7 @@ router.patch('/users/:userId', async (req, res, next)=>{
 		if (!existUser) {
 			return res.status(404).json({ message: '존재하지 않는 유저입니다.' });
 		}
-		
+
 		if (existUser.id !== +userId) {
 			return res
 				.status(404)
