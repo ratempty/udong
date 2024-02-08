@@ -10,8 +10,7 @@ const router = express.Router();
  */
 router.post("/community", authMiddleWare, async (req, res, next) => {
   const { comName, interest } = req.body;
-  const loginId = req.user.userId;
-  console.log(loginId);
+  const loginId = req.user.id;
 
   if (!comName) {
     return res.status(400).json({ message: "모임 이름을 입력하세요." });
@@ -46,53 +45,57 @@ router.post("/community", authMiddleWare, async (req, res, next) => {
  * 모임 삭제
  */
 
-router.delete("/community/:communityId", async (req, res, next) => {
-  const { communityId } = req.params;
-  //const loginId = req.user.userId;
-  const loginId = 1;
+router.delete(
+  "/community/:communityId",
+  authMiddleWare,
+  async (req, res, next) => {
+    const { communityId } = req.params;
+    const loginId = req.user.id;
 
-  if (!communityId) {
-    return res
-      .status(400)
-      .json({ message: "잘못된 접근입니다. (삭제할 모임 확인 불가)" });
-  }
-
-  if (!loginId) {
-    return res.status(401).json({ message: "로그인하세요." });
-  }
-
-  try {
-    const existingCommunity = await prisma.community.findFirst({
-      where: { id: +communityId },
-    });
-
-    if (!existingCommunity) {
+    if (!communityId) {
       return res
-        .status(404)
-        .json({ message: "삭제하려는 모임이 존재하지 않습니다." });
+        .status(400)
+        .json({ message: "잘못된 접근입니다. (삭제할 모임 확인 불가)" });
     }
 
-    if (loginId != existingCommunity.managerId) {
-      return res.status(403).json({ message: "모임장만 삭제 가능합니다." });
+    if (!loginId) {
+      return res.status(401).json({ message: "로그인하세요." });
     }
 
-    await prisma.community.delete({
-      where: { id: +communityId },
-    });
+    try {
+      const existingCommunity = await prisma.community.findFirst({
+        where: { id: +communityId },
+      });
 
-    return res.status(200).json({ message: "성공적으로 모임을 삭제했습니다." });
-  } catch (error) {
-    return res
-      .status(500)
-      .json({ message: "서버 오류가 발생했습니다.", error: error.message });
+      if (!existingCommunity) {
+        return res
+          .status(404)
+          .json({ message: "삭제하려는 모임이 존재하지 않습니다." });
+      }
+
+      // if (loginId != existingCommunity.managerId) {
+      //   return res.status(403).json({ message: "모임장만 삭제 가능합니다." });
+      // }
+
+      await prisma.community.delete({
+        where: { id: +communityId },
+      });
+
+      return res
+        .status(200)
+        .json({ message: "성공적으로 모임을 삭제했습니다." });
+    } catch (error) {
+      return res
+        .status(500)
+        .json({ message: "서버 오류가 발생했습니다.", error: error.message });
+    }
   }
-});
+);
 //모임 게시글 조회 => 해당모임을 선택하면 게시글 뿌려줌
 router.get("/community/:communityId", async (req, res, next) => {
   try {
     const { communityId } = req.params;
-    console.log(communityId);
-    //
+
     const findCommuinty = await prisma.community.findFirst({
       where: { id: +communityId },
     });
@@ -116,7 +119,7 @@ router.get("/community/:communityId", async (req, res, next) => {
       where: {
         communityId: +communityId,
       },
-      include: {
+      select: {
         id: true,
         title: true,
         content: true,
@@ -142,7 +145,7 @@ router.post(
   "/com-sign-up/:communityId",
   authMiddleWare,
   async (req, res, next) => {
-    const { userId } = req.user;
+    const { id } = req.user;
     const { communityId } = req.params;
 
     const findCommuinty = await prisma.community.findFirst({
@@ -156,7 +159,7 @@ router.post(
 
     const User = await prisma.communityUsers.findFirst({
       where: {
-        userId: +userId,
+        userId: +id,
       },
     });
     if (User) {
@@ -168,7 +171,7 @@ router.post(
     const signupUser = await prisma.communityUsers.create({
       data: {
         communityId: +communityId,
-        userId: +userId,
+        userId: +id,
       },
     });
 
@@ -205,7 +208,7 @@ router.get("/community/:communityId", async (req, res, next) => {
       where: {
         communityId: +communityId,
       },
-      include: {
+      select: {
         id: true,
         title: true,
         content: true,
