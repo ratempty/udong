@@ -1,5 +1,3 @@
-import jwt from "jsonwebtoken";
-import { prisma } from "../utils/index.js";
+import jwt from 'jsonwebtoken';
+import { prisma } from '../utils/prisma/index.js';
 import { createAccessToken } from "../utils/token.js";
-
-export default function () {}
