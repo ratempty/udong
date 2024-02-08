@@ -84,6 +84,7 @@ router.delete('/community/:communityId', async (req, res, next) => {
 			.status(500)
 			.json({ message: '서버 오류가 발생했습니다.', error: error.message });
 	}
+})
 
   //모임 게시글 조회 => 해당모임을 선택하면 게시글 뿌려줌
 router.get("/community/:communityId", async (req, res, next) => {
