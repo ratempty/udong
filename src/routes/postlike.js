@@ -1,5 +1,6 @@
 import express from "express";
 import authMiddleWare from "../middleware/auth.middleware.js";
+import { prisma } from "../utils/index.js";
 
 const router = express.Router();
 
@@ -7,16 +8,7 @@ const router = express.Router();
 router.post("/like/:postId", authMiddleWare, async (req, res, next) => {
   try {
     const { postId } = req.params;
-    const { userId } = req.user; //임시, 수정필요
-
-    // const findCommuinty = await prisma.community.findFirst({
-    //   where: { id: +communityId },
-    // });
-    // if (!findCommuinty) {
-    //   return res
-    //     .status(404)
-    //     .json({ message: "모임 정보가 존재하지 않습니다." });
-    // }
+    const { id } = req.user;
 
     const Findpost = await prisma.posts.findFirst({
       where: { id: +postId },
@@ -31,12 +23,13 @@ router.post("/like/:postId", authMiddleWare, async (req, res, next) => {
     //아이디에 해당하는 포스트를 찾아서,
     //인증된 유저 정보가 해당 포스트에 좋아요 기록이 없다면 좋아요, 있다면 좋아요 취소
     const like = await prisma.likes.findFirst({
-      where: { userId: +userId, postId: +postId },
+      where: { userId: +id, postId: +postId },
     });
     if (!like) {
       await prisma.likes.create({
         data: {
-          id: 1,
+          userId: +id,
+          postId: +postId,
         },
       });
     } else {
@@ -44,6 +37,8 @@ router.post("/like/:postId", authMiddleWare, async (req, res, next) => {
         .status(402)
         .json({ message: "좋아요는 한번만 누를 수 있습니다." });
     }
+
+    return res.status(201).json({ message: "좋아용" });
   } catch (err) {
     next(err);
   }
@@ -53,7 +48,7 @@ router.post("/like/:postId", authMiddleWare, async (req, res, next) => {
 router.delete("/like/:postId", authMiddleWare, async (req, res, next) => {
   try {
     const { postId } = req.params;
-    const { userId } = req.user; //임시, 수정필요
+    const { id } = req.user;
 
     const Findpost = await prisma.posts.findFirst({
       where: { id: +postId },
@@ -66,15 +61,16 @@ router.delete("/like/:postId", authMiddleWare, async (req, res, next) => {
     }
 
     const like = await prisma.likes.findFirst({
-      where: { userId: +userId, postId: +postId },
+      where: { userId: +id, postId: +postId },
     });
     if (like) {
       await prisma.likes.delete({
-        where: { userId: +userId, postId: +postId },
+        where: { id: like.id },
       });
     } else {
       return res.status(402).json({ message: "좋아요 기록이 없습니다." });
     }
+    return res.status(200).json({ message: "싫어요" });
   } catch (err) {
     next(err);
   }

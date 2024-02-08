@@ -126,7 +126,7 @@ router.get("/community/:communityId", async (req, res, next) => {
         parentsId: true,
         createdAt: true,
         updatedAt: true,
-        Users: {
+        user: {
           select: {
             name: true,
           },
@@ -183,8 +183,7 @@ router.post(
 router.get("/community/:communityId", async (req, res, next) => {
   try {
     const { communityId } = req.params;
-    console.log(communityId);
-    //
+
     const findCommuinty = await prisma.community.findFirst({
       where: { id: +communityId },
     });
