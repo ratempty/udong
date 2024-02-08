@@ -3,7 +3,6 @@ import { prisma } from '../utils/index.js';
 
 const router = express.Router();
 
-
 /**
  * 프로필 조회
  */
@@ -14,15 +13,15 @@ router.get('/users/:userId', async (req, res, next) => {
 	const user = await prisma.users.findFirst({
 		where: { id: +userId },
 		select: {
-			name : true,
+			name: true,
 			email: true,
 			interest: true,
-			profileImage : true,
+			profileImage: true,
 		},
 	});
-	
-	if(!user){
-		return res.status(404).json({ message: "존재하지 않는 유저입니다." });
+
+	if (!user) {
+		return res.status(404).json({ message: '존재하지 않는 유저입니다.' });
 	}
 
 	return res.status(200).json({ data: user });
@@ -31,7 +30,7 @@ router.get('/users/:userId', async (req, res, next) => {
 /**
  * 본인 프로필 수정
  */
-router.patch('/users/:userId', async (req, res, next)=>{
+router.patch('/users/:userId', async (req, res, next) => {
 	const { userId } = req.params;
 	//const userId = req.user.userId;
 	const { name, email, interest, profileImage } = req.body;
@@ -70,7 +69,6 @@ router.patch('/users/:userId', async (req, res, next)=>{
 			.status(500)
 			.json({ message: '서버 오류가 발생했습니다.', error: error.message });
 	}
-
-})
+});
 
 export default router;
