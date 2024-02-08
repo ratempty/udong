@@ -215,7 +215,7 @@ router.get("/community/:communityId", async (req, res, next) => {
         parentsId: true,
         createdAt: true,
         updatedAt: true,
-        Users: {
+        user: {
           select: {
             name: true,
           },
