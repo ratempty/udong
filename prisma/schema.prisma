@@ -46,7 +46,7 @@ model Posts {
 
 model Community {
   id        Int         @id @default(autoincrement()) @map("id")
-  comName   String      @map("comName")
+  comName     String    @map("comName")
   interest  String      @map("interest")
 
   posts Posts[]
