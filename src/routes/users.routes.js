@@ -1,7 +1,8 @@
-import express from "express";
-import bcrypt from "bcrypt";
-import { prisma } from "../utils/index.js";
-import { createAccessToken, createRefreshToken } from "../utils/token.js";
+import express from 'express';
+import bcrypt from 'bcrypt';
+import { prisma } from '../utils/index.js';
+import { createAccessToken } from "../utils/token.js";
+
 
 const router = express.Router();
 
@@ -46,33 +47,25 @@ router.post("/sign-up", async (req, res, next) => {
   }
 });
 
-router.post("/sign-in", async (req, res, next) => {
-  try {
-    const { email, password } = req.body;
-    const user = await prisma.users.findUnique({ where: { email } });
-    console.log(email);
+router.post('/sign-in', async (req, res, next) => {
+	try {
+		const { email, password } = req.body;
+		const user = await prisma.users.findUnique({ where: { email } });
 
-    if (!user)
-      return res
-        .status(401)
-        .json({ message: "유효하지 않은 이메일 또는 비밀번호" });
+		if (!user)
+			return res.status(401).json({ message: '유효하지 않은 이메일 또는 비밀번호' });
 
-    const validPassword = await bcrypt.compare(password, user.password);
-    if (!validPassword)
-      return res
-        .status(401)
-        .json({ message: "유효하지 않은 이메일 또는 비밀번호" });
+		const validPassword = await bcrypt.compare(password, user.password);
+		if (!validPassword)
+			return res.status(401).json({ message: '유효하지 않은 이메일 또는 비밀번호' });
 
-    const refreshToken = createRefreshToken(email);
-    const accessToken = createAccessToken(email);
+		const accessToken = createAccessToken(user.userId);
 
-    res.cookie("accessToken", accessToken, { httpOnly: true });
-    res.cookie("refreshToken", refreshToken, { httpOnly: true });
-
-    return res.status(200).json({ message: "로그인 성공" });
-  } catch (err) {
-    next(err);
-  }
+		res.cookie('authorization', `Bearer ${accessToken}`);
+		return res.status(200).json({ message: '로그인 성공' });
+	} catch (err) {
+		next(err);
+	}
 });
 
 /**
