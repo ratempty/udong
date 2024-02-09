@@ -118,7 +118,7 @@ router.delete('/community/:postId', authMiddleware, async (req, res, next) => {
 router.post('/comment/:parentsId', authMiddleware, async (req, res, next) => {
 	const { content } = req.body;
 	const { parentsId } = req.params;
-    const loginId = req.user.id;
+	const loginId = req.user.id;
 
 	if (!loginId) {
 		return res.status(400).json({ message: '작성자 정보를 찾을 수 없습니다.' });
@@ -132,16 +132,16 @@ router.post('/comment/:parentsId', authMiddleware, async (req, res, next) => {
 		return res.status(400).json({ message: '댓글 내용을 입력하세요.' });
 	}
 
-    const existingUsers = await prisma.users.findUnique({
+	const existingUsers = await prisma.users.findUnique({
 		where: {
 			id: +loginId,
 		},
 	});
-    if(!existingUsers){
+	if (!existingUsers) {
 		return res.status(400).json({ message: '올바른 작성자 정보가 아닙니다.' });
-    }
+	}
 
-    const existingPost = await prisma.posts.findUnique({
+	const existingPost = await prisma.posts.findUnique({
 		where: {
 			id: +parentsId,
 			isComment: false,
@@ -149,9 +149,7 @@ router.post('/comment/:parentsId', authMiddleware, async (req, res, next) => {
 	});
 
 	if (!existingPost) {
-		return res
-			.status(409)
-			.json({ message: '존재하지 않는 게시글입니다.' });
+		return res.status(409).json({ message: '존재하지 않는 게시글입니다.' });
 	}
 
 	const postCommunity = await prisma.community.findFirst({
@@ -272,7 +270,6 @@ router.get('/comment/:parentsId', authMiddleware, async (req, res, next) => {
 	}
 });
 
-
 /**
  * 댓글 삭제
  */
@@ -286,7 +283,9 @@ router.delete('/comment/:postId', authMiddleware, async (req, res, next) => {
 		});
 
 		if (!existingComment) {
-			return res.status(404).json({ message: '삭제할 댓글 조회에 실패하였습니다.' });
+			return res
+				.status(404)
+				.json({ message: '삭제할 댓글 조회에 실패하였습니다.' });
 		}
 
 		if (existingComment.userId !== loginId) {
@@ -296,7 +295,7 @@ router.delete('/comment/:postId', authMiddleware, async (req, res, next) => {
 		}
 
 		await prisma.posts.delete({
-			where: { id: +postId, isComment : true, },
+			where: { id: +postId, isComment: true },
 		});
 
 		return res

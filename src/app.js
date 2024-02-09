@@ -13,6 +13,7 @@ const PORT = 3000;
 app.use(express.json());
 app.use(cookieParser());
 app.use(errorMiddleware);
+app.use(express.static('public'));
 app.use("/api", [kakaoLogin, userRouter, community, postRouter, postlike]);
 
 app.listen(PORT, () => {

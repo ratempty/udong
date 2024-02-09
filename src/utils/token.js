@@ -1,12 +1,19 @@
-import jwt from "jsonwebtoken";
-import dotenv from "dotenv";
+import jwt from 'jsonwebtoken';
+import dotenv from 'dotenv';
 
 dotenv.config();
 
 export function createAccessToken(id) {
-  return jwt.sign({ id }, process.env.CUSTOM_SECRET_KEY, { expiresIn: "15m" });
+	try {
+		const accessToken = jwt.sign({ id }, process.env.CUSTOM_SECRET_KEY, {
+			expiresIn: '15m',
+		});
+		return accessToken;
+	} catch (error) {
+		throw new Error('토큰 생성 에러.' + error.message);
+	}
 }
 
 export function createRefreshToken(id) {
-  return jwt.sign({ id }, process.env.CUSTOM_SECRET_KEY, { expiresIn: "12h" });
+	return jwt.sign({ id }, process.env.CUSTOM_SECRET_KEY, { expiresIn: '12h' });
 }
