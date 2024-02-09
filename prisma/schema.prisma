@@ -45,9 +45,11 @@ model Posts {
 }
 
 model Community {
-  id        Int         @id @default(autoincrement()) @map("id")
-  comName     String    @map("comName")
-  interest  String      @map("interest")
+  id              Int         @id @default(autoincrement()) @map("id")
+  comName         String      @map("comName")
+  interest        String      @map("interest")
+  managerId       Int         @map("managerId")
+  communityImage  String?     @map("communityImage")
 
   posts Posts[]
   communityUsers CommunityUsers[]
