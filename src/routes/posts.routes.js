@@ -236,7 +236,7 @@ router.patch('/comment/:postId', authMiddleware, async (req, res, next) => {
 /**
  * 댓글 조회
  */
-router.get('/comment/:parentsId', async (req, res, next) => {
+router.get('/comment/:parentsId', authMiddleware, async (req, res, next) => {
 	const { orderKey, orderValue } = req.query;
 	const validOrderValue =
 		orderValue && orderValue.toUpperCase() === 'ASC' ? 'asc' : 'desc';
