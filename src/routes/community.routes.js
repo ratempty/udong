@@ -1,44 +1,44 @@
-import express from 'express';
-import { prisma } from '../utils/index.js';
-import jwt from 'jsonwebtoken';
-import authMiddleWare from '../middleware/auth.middleware.js';
+import express from "express";
+import { prisma } from "../utils/index.js";
+import jwt from "jsonwebtoken";
+import authMiddleWare from "../middleware/auth.middleware.js";
 
 const router = express.Router();
 
 /**
  * 모임 개설
  */
-router.post('/community', authMiddleWare, async (req, res, next) => {
-	const { comName, interest } = req.body;
-	const loginId = req.user.id;
+router.post("/community", authMiddleWare, async (req, res, next) => {
+  const { comName, interest } = req.body;
+  const loginId = req.user.id;
 
-	if (!comName) {
-		return res.status(400).json({ message: '모임 이름을 입력하세요.' });
-	}
+  if (!comName) {
+    return res.status(400).json({ message: "모임 이름을 입력하세요." });
+  }
 
-	if (!interest) {
-		return res.status(400).json({ message: '관심사를 선택하세요.' });
-	}
+  if (!interest) {
+    return res.status(400).json({ message: "관심사를 선택하세요." });
+  }
 
-	if (!loginId) {
-		return res.status(401).json({ message: '로그인하세요.' });
-	}
+  if (!loginId) {
+    return res.status(401).json({ message: "로그인하세요." });
+  }
 
-	try {
-		const community = await prisma.community.create({
-			data: {
-				comName,
-				interest,
-				// managerId: loginId,
-			},
-		});
+  try {
+    const community = await prisma.community.create({
+      data: {
+        comName,
+        interest,
+        // managerId: loginId,
+      },
+    });
 
-		return res.status(201).json({ message: '모임이 정상 등록되었습니다.' });
-	} catch (error) {
-		return res
-			.status(500)
-			.json({ message: '서버 오류가 발생했습니다.', error: error.message });
-	}
+    return res.status(201).json({ message: "모임이 정상 등록되었습니다." });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: "서버 오류가 발생했습니다.", error: error.message });
+  }
 });
 
 /**
@@ -46,186 +46,228 @@ router.post('/community', authMiddleWare, async (req, res, next) => {
  */
 
 router.delete(
-	'/community/:communityId',
-	authMiddleWare,
-	async (req, res, next) => {
-		const { communityId } = req.params;
-		const loginId = req.user.id;
+  "/community/:communityId",
+  authMiddleWare,
+  async (req, res, next) => {
+    const { communityId } = req.params;
+    const loginId = req.user.id;
 
-		if (!communityId) {
-			return res
-				.status(400)
-				.json({ message: '잘못된 접근입니다. (삭제할 모임 확인 불가)' });
-		}
+    if (!communityId) {
+      return res
+        .status(400)
+        .json({ message: "잘못된 접근입니다. (삭제할 모임 확인 불가)" });
+    }
 
-		if (!loginId) {
-			return res.status(401).json({ message: '로그인하세요.' });
-		}
+    if (!loginId) {
+      return res.status(401).json({ message: "로그인하세요." });
+    }
 
-		try {
-			const existingCommunity = await prisma.community.findFirst({
-				where: { id: +communityId },
-			});
+    try {
+      const existingCommunity = await prisma.community.findFirst({
+        where: { id: +communityId },
+      });
 
-			if (!existingCommunity) {
-				return res
-					.status(404)
-					.json({ message: '삭제하려는 모임이 존재하지 않습니다.' });
-			}
+      if (!existingCommunity) {
+        return res
+          .status(404)
+          .json({ message: "삭제하려는 모임이 존재하지 않습니다." });
+      }
 
-			// if (loginId != existingCommunity.managerId) {
-			//   return res.status(403).json({ message: "모임장만 삭제 가능합니다." });
-			// }
+      // if (loginId != existingCommunity.managerId) {
+      //   return res.status(403).json({ message: "모임장만 삭제 가능합니다." });
+      // }
 
-			await prisma.community.delete({
-				where: { id: +communityId },
-			});
+      await prisma.community.delete({
+        where: { id: +communityId },
+      });
 
-			return res
-				.status(200)
-				.json({ message: '성공적으로 모임을 삭제했습니다.' });
-		} catch (error) {
-			return res
-				.status(500)
-				.json({ message: '서버 오류가 발생했습니다.', error: error.message });
-		}
-	},
+      return res
+        .status(200)
+        .json({ message: "성공적으로 모임을 삭제했습니다." });
+    } catch (error) {
+      return res
+        .status(500)
+        .json({ message: "서버 오류가 발생했습니다.", error: error.message });
+    }
+  }
 );
+
+//추천 모임 조회
+router.get("/recommendCom", authMiddleWare, async (req, res, next) => {
+  try {
+    const userId = req.user.id;
+
+    //로그인한 유저의 관심사 조회
+    const interestOutput = await prisma.users.findMany({
+      where: { id: +userId },
+      select: {
+        interest: true,
+      },
+    });
+
+    if (!interestOutput) {
+      //현재 존재하는 모임을 랜덤으로 출력
+      return res.status(404).json({ message: "관심사를 등록해주세요" });
+    }
+
+    const interests = interestOutput[0].interest;
+    // const interest = [...interests];
+    console.log(interests);
+
+    //관심사 중 하나 일치하는 모임 조회하기
+    const Interest = interests.split(",");
+
+    //관심사와 일치하는 모임 출력
+    const correctCom = await prisma.community.findMany({
+      where: { interest: interests },
+      select: {
+        id: true,
+        comName: true,
+        interest: true,
+      },
+    });
+
+    return res.status(201).json({ data: correctCom });
+  } catch (err) {
+    next(err);
+  }
+});
+
 //모임 게시글 조회 => 해당모임을 선택하면 게시글 뿌려줌
-router.get('/community/:communityId', async (req, res, next) => {
-	try {
-		const { communityId } = req.params;
+router.get("/community/:communityId", async (req, res, next) => {
+  try {
+    const { communityId } = req.params;
 
-		const findCommuinty = await prisma.community.findFirst({
-			where: { id: +communityId },
-		});
-		if (!findCommuinty) {
-			return res
-				.status(404)
-				.json({ message: '모임 정보가 존재하지 않습니다.' });
-		}
+    const findCommuinty = await prisma.community.findFirst({
+      where: { id: +communityId },
+    });
+    if (!findCommuinty) {
+      return res
+        .status(404)
+        .json({ message: "모임 정보가 존재하지 않습니다." });
+    }
 
-		const findPosts = await prisma.posts.findFirst({
-			where: {
-				communityId: +communityId,
-			},
-		});
-		if (!findPosts) {
-			return res.status(404).json({ message: '표시할 게시글이 없습니다.' });
-		}
+    const findPosts = await prisma.posts.findFirst({
+      where: {
+        communityId: +communityId,
+      },
+    });
+    if (!findPosts) {
+      return res.status(404).json({ message: "표시할 게시글이 없습니다." });
+    }
 
-		//이 밑으로 확인 필요
-		const posts = await prisma.posts.findMany({
-			where: {
-				communityId: +communityId,
-			},
-			select: {
-				id: true,
-				title: true,
-				content: true,
-				parentsId: true,
-				createdAt: true,
-				updatedAt: true,
-				user: {
-					select: {
-						name: true,
-					},
-				},
-			},
-		});
+    //이 밑으로 확인 필요
+    const posts = await prisma.posts.findMany({
+      where: {
+        communityId: +communityId,
+      },
+      select: {
+        id: true,
+        title: true,
+        content: true,
+        parentsId: true,
+        createdAt: true,
+        updatedAt: true,
+        user: {
+          select: {
+            name: true,
+          },
+        },
+      },
+    });
 
-		return res.status(201).json({ data: posts });
-	} catch (err) {
-		next(err);
-	}
+    return res.status(201).json({ data: posts });
+  } catch (err) {
+    next(err);
+  }
 });
 
 //모임가입
 router.post(
-	'/com-sign-up/:communityId',
-	authMiddleWare,
-	async (req, res, next) => {
-		const { id } = req.user;
-		const { communityId } = req.params;
+  "/com-sign-up/:communityId",
+  authMiddleWare,
+  async (req, res, next) => {
+    const { id } = req.user;
+    const { communityId } = req.params;
 
-		const findCommuinty = await prisma.community.findFirst({
-			where: { id: +communityId },
-		});
-		if (!findCommuinty) {
-			return res
-				.status(404)
-				.json({ message: '모임 정보가 존재하지 않습니다.' });
-		}
+    const findCommuinty = await prisma.community.findFirst({
+      where: { id: +communityId },
+    });
+    if (!findCommuinty) {
+      return res
+        .status(404)
+        .json({ message: "모임 정보가 존재하지 않습니다." });
+    }
 
-		const User = await prisma.communityUsers.findFirst({
-			where: {
-				userId: +id,
-			},
-		});
-		if (User) {
-			return res
-				.status(404)
-				.json({ message: '이미 모임에 가입된 사용자 입니다.' });
-		}
+    const User = await prisma.communityUsers.findFirst({
+      where: {
+        userId: +id,
+      },
+    });
+    if (User) {
+      return res
+        .status(404)
+        .json({ message: "이미 모임에 가입된 사용자 입니다." });
+    }
 
-		const signupUser = await prisma.communityUsers.create({
-			data: {
-				communityId: +communityId,
-				userId: +id,
-			},
-		});
+    const signupUser = await prisma.communityUsers.create({
+      data: {
+        communityId: +communityId,
+        userId: +id,
+      },
+    });
 
-		return res.status(201).json({ message: '모임 가입 완료했습니다.' });
-	},
+    return res.status(201).json({ message: "모임 가입 완료했습니다." });
+  }
 );
 
 //모임 게시글 조회 => 해당모임을 선택하면 게시글 뿌려줌
-router.get('/community/:communityId', async (req, res, next) => {
-	try {
-		const { communityId } = req.params;
+router.get("/community/:communityId", async (req, res, next) => {
+  try {
+    const { communityId } = req.params;
 
-		const findCommuinty = await prisma.community.findFirst({
-			where: { id: +communityId },
-		});
-		if (!findCommuinty) {
-			return res
-				.status(404)
-				.json({ message: '모임 정보가 존재하지 않습니다.' });
-		}
+    const findCommuinty = await prisma.community.findFirst({
+      where: { id: +communityId },
+    });
+    if (!findCommuinty) {
+      return res
+        .status(404)
+        .json({ message: "모임 정보가 존재하지 않습니다." });
+    }
 
-		const findPosts = await prisma.posts.findFirst({
-			where: {
-				communityId: +communityId,
-			},
-		});
-		if (!findPosts) {
-			return res.status(404).json({ message: '표시할 게시글이 없습니다.' });
-		}
+    const findPosts = await prisma.posts.findFirst({
+      where: {
+        communityId: +communityId,
+      },
+    });
+    if (!findPosts) {
+      return res.status(404).json({ message: "표시할 게시글이 없습니다." });
+    }
 
-		//이 밑으로 확인 필요
-		const posts = await prisma.posts.findMany({
-			where: {
-				communityId: +communityId,
-			},
-			select: {
-				id: true,
-				title: true,
-				content: true,
-				parentsId: true,
-				createdAt: true,
-				updatedAt: true,
-				user: {
-					select: {
-						name: true,
-					},
-				},
-			},
-		});
+    //이 밑으로 확인 필요
+    const posts = await prisma.posts.findMany({
+      where: {
+        communityId: +communityId,
+      },
+      select: {
+        id: true,
+        title: true,
+        content: true,
+        parentsId: true,
+        createdAt: true,
+        updatedAt: true,
+        user: {
+          select: {
+            name: true,
+          },
+        },
+      },
+    });
 
-		return res.status(201).json({ data: posts });
-	} catch (err) {
-		next(err);
-	}
+    return res.status(201).json({ data: posts });
+  } catch (err) {
+    next(err);
+  }
 });
 
 export default router;
