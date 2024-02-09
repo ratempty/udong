@@ -115,27 +115,48 @@ router.delete('/community/:postId', authMiddleware, async (req, res, next) => {
 /**
  * 댓글 등록
  */
-router.post('/comment/:parentsId', async (req, res, next) => {
+router.post('/comment/:parentsId', authMiddleware, async (req, res, next) => {
 	const { content } = req.body;
 	const { parentsId } = req.params;
-	//const loginId = req.user.userId;
-	const loginId = 1;
+    const loginId = req.user.id;
 
 	if (!loginId) {
-		return res.status(401).json({ message: '작성자 정보를 찾을 수 없습니다.' });
+		return res.status(400).json({ message: '작성자 정보를 찾을 수 없습니다.' });
 	}
 
 	if (!parentsId) {
-		return res.status(401).json({ message: '원글을 찾을 수 없습니다.' });
-	}
-	if (!content) {
-		return res.status(401).json({ message: '댓글 내용을 입력하세요.' });
+		return res.status(400).json({ message: '원글을 찾을 수 없습니다.' });
 	}
 
-	const postCommunity = await prisma.posts.findFirst({
+	if (!content) {
+		return res.status(400).json({ message: '댓글 내용을 입력하세요.' });
+	}
+
+    const existingUsers = await prisma.users.findUnique({
+		where: {
+			id: +loginId,
+		},
+	});
+    if(!existingUsers){
+		return res.status(400).json({ message: '올바른 작성자 정보가 아닙니다.' });
+    }
+
+    const existingPost = await prisma.posts.findUnique({
 		where: {
 			id: +parentsId,
 			isComment: false,
+		},
+	});
+
+	if (!existingPost) {
+		return res
+			.status(409)
+			.json({ message: '존재하지 않는 게시글입니다.' });
+	}
+
+	const postCommunity = await prisma.community.findFirst({
+		where: {
+			id: +existingPost.communityId,
 		},
 	});
 
@@ -146,7 +167,7 @@ router.post('/comment/:parentsId', async (req, res, next) => {
 	}
 
 	try {
-		const communityId = postCommunity.communityId;
+		const communityId = postCommunity.id;
 		const comment = await prisma.posts.create({
 			data: {
 				userId: +loginId,
@@ -165,15 +186,14 @@ router.post('/comment/:parentsId', async (req, res, next) => {
 			.json({ message: '서버 오류가 발생했습니다.', error: error.message });
 	}
 });
+
 /**
  * 댓글 수정
  */
-router.patch('/comment/:postId', async (req, res, next) => {
+router.patch('/comment/:postId', authMiddleware, async (req, res, next) => {
 	const { postId } = req.params;
 	const { content } = req.body;
-
-	//const loginId = req.user.userId;
-	const loginId = 1;
+	const loginId = req.user.id;
 
 	try {
 		const existingComment = await prisma.posts.findUnique({
@@ -185,13 +205,13 @@ router.patch('/comment/:postId', async (req, res, next) => {
 
 		if (!existingComment) {
 			return res
-				.status(404)
+				.status(400)
 				.json({ message: '해당 댓글 조회에 실패하였습니다.' });
 		}
 
 		if (existingComment.userId !== loginId) {
 			return res
-				.status(404)
+				.status(403)
 				.json({ message: '본인의 댓글만 수정하실 수 있습니다.' });
 		}
 
@@ -245,6 +265,43 @@ router.get('/comment/:parentsId', async (req, res, next) => {
 
 		const comments = await prisma.posts.findMany(query);
 		return res.status(200).json({ data: comments });
+	} catch (error) {
+		return res
+			.status(500)
+			.json({ message: '서버 오류가 발생했습니다.', error: error.message });
+	}
+});
+
+
+/**
+ * 댓글 삭제
+ */
+router.delete('/comment/:postId', authMiddleware, async (req, res, next) => {
+	const { postId } = req.params;
+	const loginId = req.user.id;
+
+	try {
+		const existingComment = await prisma.posts.findUnique({
+			where: { id: +postId },
+		});
+
+		if (!existingComment) {
+			return res.status(404).json({ message: '삭제할 댓글 조회에 실패하였습니다.' });
+		}
+
+		if (existingComment.userId !== loginId) {
+			return res
+				.status(403)
+				.json({ message: '본인의 댓글만 삭제하실 수 있습니다.' });
+		}
+
+		await prisma.posts.delete({
+			where: { id: +postId, isComment : true, },
+		});
+
+		return res
+			.status(200)
+			.json({ message: '댓글이 성공적으로 삭제되었습니다.' });
 	} catch (error) {
 		return res
 			.status(500)
