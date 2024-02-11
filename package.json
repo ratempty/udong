@@ -1,21 +1,23 @@
 {
-  "name": "udong",
-  "version": "1.0.0",
-  "main": "index.js",
-  "license": "MIT",
-  "type": "module",
-  "dependencies": {
-    "@prisma/client": "^5.9.1",
-    "axios": "^1.6.7",
-    "bcrypt": "^5.1.1",
-    "cookie-parser": "^1.4.6",
-    "express": "^4.18.2",
-    "jsonwebtoken": "^9.0.2",
-    "prisma": "^5.9.1"
-  },
-  "devDependencies": {
-    "@types/cookie-parser": "^1.4.6",
-    "dotenv": "^16.4.1",
-    "nodemon": "^3.0.3"
-  }
+	"name": "udong",
+	"version": "1.0.0",
+	"main": "index.js",
+	"license": "MIT",
+	"type": "module",
+	"dependencies": {
+		"@prisma/client": "^5.9.1",
+		"axios": "^1.6.7",
+		"bcrypt": "^5.1.1",
+		"cookie-parser": "^1.4.6",
+		"express": "^4.18.2",
+		"jsonwebtoken": "^9.0.2",
+		"multer": "^1.4.5-lts.1",
+		"prettier": "^3.2.5",
+		"prisma": "^5.9.1"
+	},
+	"devDependencies": {
+		"@types/cookie-parser": "^1.4.6",
+		"dotenv": "^16.4.1",
+		"nodemon": "^3.0.3"
+	}
 }
