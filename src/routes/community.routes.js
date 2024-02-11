@@ -114,9 +114,6 @@ router.get("/recommendCom", authMiddleWare, async (req, res, next) => {
     // const interest = [...interests];
     console.log(interests);
 
-    //관심사 중 하나 일치하는 모임 조회하기
-    const Interest = interests.split(",");
-
     //관심사와 일치하는 모임 출력
     const correctCom = await prisma.community.findMany({
       where: { interest: interests },
@@ -127,6 +124,17 @@ router.get("/recommendCom", authMiddleWare, async (req, res, next) => {
       },
     });
 
+    //관심사 중 하나 일치하는 모임 조회하기
+    const Interest = interests.split(",");
+
+    const comInterest = await prisma.community.findMany({
+      select: {
+        interest: true,
+      },
+    });
+    console.log(comInterest.interest);
+
+    //모임 아이디 중복일시 삭제
     return res.status(201).json({ data: correctCom });
   } catch (err) {
     next(err);
