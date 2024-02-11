@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<link rel="stylesheet" href="./style/style.css" />
+		<link rel="stylesheet" href="./style/basic.css" />
+		<title>우리동네 동아리</title>
+	</head>
+	<body>
+		<header>
+			<div class="header-left">로고</div>
+			<div class="header-right">
+				<button id="btn-login" data-modal-target="#modal-login">로그인</button>
+				<button>로그아웃</button>
+				<button id="btn-signup" data-modal-target="#modal-signup">
+					회원가입
+				</button>
+				<button>내 정보</button>
+			</div>
+		</header>
+		<button class="create-community-button">모임 개설하기</button>
+		<nav class="community-nav">
+			<div class="nav-images">
+				<!-- 소모임 이미지들 -->
+				<img src="image1.jpg" alt="소모임1" />
+				<img src="image2.jpg" alt="소모임2" />
+				<!-- 여러 소모임 이미지들을 추가하세요 -->
+			</div>
+		</nav>
+		<div class="content">
+			<!-- 콘텐츠 내용 -->
+			<p>여기에 콘텐츠 내용이 들어갑니다.</p>
+		</div>
+		<footer>
+			<p>푸터 내용</p>
+		</footer>
+
+		<!-- 모달 창 -->
+		<div id="modal-login" class="modal">
+			<div class="modal-content">
+				<span class="close">&times;</span>
+				<form id="loginForm">
+					<label for="username">아이디:</label>
+					<input type="text" id="username" name="username" required />
+					<label for="password">패스워드:</label>
+					<input type="password" id="password" name="password" required />
+					<button type="submit">로그인</button>
+				</form>
+			</div>
+		</div>
+
+		<div id="modal-signup" class="modal">
+			<div class="modal-content">
+				<span class="close">&times;</span>
+				<form id="signupForm">
+					<label for="email">이메일:</label>
+					<input type="email" id="email" name="email" required />
+
+					<label for="password">패스워드:</label>
+					<input type="password" id="password" name="password" required />
+
+					<label for="name">이름:</label>
+					<input type="text" id="name" name="name" required />
+
+					<label for="interest">관심사:</label>
+					<input type="text" id="interest" name="interest" />
+
+					<label for="profileImage">프로필 이미지:</label>
+					<input type="file" id="profileImage" name="profileImage" />
+
+					<button type="submit">회원가입</button>
+				</form>
+			</div>
+		</div>
+		<script src="./js/script.js"></script>
+	</body>
+</html>
