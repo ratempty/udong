@@ -1,50 +1,74 @@
 import express from 'express';
 import bcrypt from 'bcrypt';
+import multer from 'multer';
 import { prisma } from '../utils/index.js';
 import { createAccessToken } from '../utils/token.js';
+import { fileURLToPath } from 'url';
+import path, { dirname } from 'path';
+import fs from 'fs';
+
 
 const router = express.Router();
 
-router.post('/sign-up', async (req, res, next) => {
-	try {
-		const { email, password, password_check, name, interest, profileImage } =
-			req.body;
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
-		const isExistUser = await prisma.users.findFirst({
-			where: {
-				email,
-			},
-		});
-		if (isExistUser) {
-			return res.status(409).json({ message: '이미 존재하는 이메일입니다.' });
-		}
-		if (password !== password_check) {
-			return res
-				.status(409)
-				.json({ message: '비밀번호는 비밀번호 확인과 일치해야 합니다.' });
-		}
-		if (password.length < 6) {
-			return res
-				.status(409)
-				.json({ message: '비밀번호는 6글자 이상이여야 합니다.' });
-		}
-		const hashedPassword = await bcrypt.hash(password, 10);
-		const user = await prisma.users.create({
-			data: {
-				email,
-				password: hashedPassword,
-				name,
-				interest,
-				profileImage,
-			},
-		});
-		return res
-			.status(201)
-			.json({ message: `${name}님 회원가입을 축하합니다.` });
-	} catch (err) {
-		next(err);
-	}
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, path.join(__dirname, '../../public/uploads/profileImages'));
+    },
+    filename: (req, file, cb) => {
+        cb(null, `${file.fieldname}-${Date.now()}${path.extname(file.originalname)}`);
+    }
 });
+
+const upload = multer({ storage: storage });
+
+router.post(
+	'/sign-up',
+	upload.single('profileImage'),
+	async (req, res, next) => {
+		try {
+			const { email, password, password_check, name, interest } = req.body;
+			const profileImage = req.file ? req.file.filename : null;
+
+			const isExistUser = await prisma.users.findFirst({
+				where: {
+					email,
+				},
+			});
+
+			if (isExistUser) {
+				return res.status(409).json({ message: '이미 존재하는 이메일입니다.' });
+			}
+			if (password !== password_check) {
+				return res
+					.status(409)
+					.json({ message: '비밀번호는 비밀번호 확인과 일치해야 합니다.' });
+			}
+			if (password.length < 6) {
+				return res
+					.status(409)
+					.json({ message: '비밀번호는 6글자 이상이여야 합니다.' });
+			}
+			const hashedPassword = await bcrypt.hash(password, 10);
+			const user = await prisma.users.create({
+				data: {
+					email,
+					password: hashedPassword,
+					name,
+					interest,
+					profileImage: profileImage,
+				},
+			});
+			return res
+				.status(201)
+				.json({ message: `${name}님 회원가입을 축하합니다.` });
+		} catch (err) {
+			next(err);
+		}
+	},
+);
 
 router.post('/sign-in', async (req, res, next) => {
 	try {
