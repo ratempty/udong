@@ -29,7 +29,7 @@ router.post("/community", authMiddleWare, async (req, res, next) => {
       data: {
         comName,
         interest,
-        // managerId: loginId,
+        managerId: loginId,
       },
     });
 
@@ -91,104 +91,6 @@ router.delete(
     }
   }
 );
-
-//추천 모임 조회
-router.get("/recommendCom", authMiddleWare, async (req, res, next) => {
-  try {
-    const userId = req.user.id;
-
-    //로그인한 유저의 관심사 조회
-    const interestOutput = await prisma.users.findMany({
-      where: { id: +userId },
-      select: {
-        interest: true,
-      },
-    });
-
-    if (!interestOutput) {
-      //현재 존재하는 모임을 랜덤으로 출력
-      return res.status(404).json({ message: "관심사를 등록해주세요" });
-    }
-
-    const interests = interestOutput[0].interest;
-    // const interest = [...interests];
-    console.log(interests);
-
-    //관심사와 일치하는 모임 출력
-    const correctCom = await prisma.community.findMany({
-      where: { interest: interests },
-      select: {
-        id: true,
-        comName: true,
-        interest: true,
-      },
-    });
-
-    //관심사 중 하나 일치하는 모임 조회하기
-    const Interest = interests.split(",");
-
-    const comInterest = await prisma.community.findMany({
-      select: {
-        interest: true,
-      },
-    });
-    console.log(comInterest.interest);
-
-    //모임 아이디 중복일시 삭제
-    return res.status(201).json({ data: correctCom });
-  } catch (err) {
-    next(err);
-  }
-});
-
-//모임 게시글 조회 => 해당모임을 선택하면 게시글 뿌려줌
-router.get("/community/:communityId", async (req, res, next) => {
-  try {
-    const { communityId } = req.params;
-
-    const findCommuinty = await prisma.community.findFirst({
-      where: { id: +communityId },
-    });
-    if (!findCommuinty) {
-      return res
-        .status(404)
-        .json({ message: "모임 정보가 존재하지 않습니다." });
-    }
-
-    const findPosts = await prisma.posts.findFirst({
-      where: {
-        communityId: +communityId,
-      },
-    });
-    if (!findPosts) {
-      return res.status(404).json({ message: "표시할 게시글이 없습니다." });
-    }
-
-    //이 밑으로 확인 필요
-    const posts = await prisma.posts.findMany({
-      where: {
-        communityId: +communityId,
-      },
-      select: {
-        id: true,
-        title: true,
-        content: true,
-        parentsId: true,
-        createdAt: true,
-        updatedAt: true,
-        user: {
-          select: {
-            name: true,
-          },
-        },
-      },
-    });
-
-    return res.status(201).json({ data: posts });
-  } catch (err) {
-    next(err);
-  }
-});
 
 //모임가입
 router.post(
@@ -252,7 +154,6 @@ router.get("/community/:communityId", async (req, res, next) => {
       return res.status(404).json({ message: "표시할 게시글이 없습니다." });
     }
 
-    //이 밑으로 확인 필요
     const posts = await prisma.posts.findMany({
       where: {
         communityId: +communityId,
@@ -279,3 +180,84 @@ router.get("/community/:communityId", async (req, res, next) => {
 });
 
 export default router;
+
+//추천 모임 조회
+router.get("/recommendCom", authMiddleWare, async (req, res, next) => {
+  try {
+    const userId = req.user.id;
+
+    //로그인한 유저의 관심사 조회
+    const interestOutput = await prisma.users.findMany({
+      where: { id: +userId },
+      select: {
+        interest: true,
+      },
+    });
+
+    //로그인이 안되어있거나, 관심사를 선택하지 않은 유저의 경우 랜덤으로 커뮤니티 조회하기
+    //물어볼것: 로그인 하지 않은 유저의 경우를 쓰고싶은데, 같은 api를 쓰니 authmiddleware를
+    //반드시 거쳐야하는 문제가 있음. 어떻게 해야 할까요?
+    const comId = await prisma.community.findMany({
+      select: {
+        id: true,
+      },
+    });
+
+    function Random() {
+      const randomId = comId.map((item) => item.id);
+      // Fisher-Yates 알고리즘을 사용하여 배열 랜덤 섞기
+      for (let i = randomId.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        // 배열의 원소 위치 바꾸기
+        [randomId[i], randomId[j]] = [randomId[j], randomId[i]];
+      }
+      return randomId;
+    }
+    const R = Random();
+
+    if (!interestOutput || !userId) {
+      //현재 존재하는 모임을 랜덤으로 출력
+      const selectThirdId = R.slice(0, 3);
+      console.log("선택된 아이디:", selectThirdId);
+      const randomCommunity = await prisma.community.findMany({
+        where: { id: { in: selectThirdId } },
+        select: {
+          id: true,
+          comName: true,
+          interest: true,
+          communityImage: true,
+          manageId: true,
+        },
+      });
+      return res.status(201).json({ data: randomCommunity });
+    }
+
+    const interests = interestOutput[0].interest;
+    // const interest = [...interests];
+    // console.log(interests);
+
+    //관심사와 일치하는 모임 출력
+    const correctCom = await prisma.community.findMany({
+      where: { interest: interests },
+      select: {
+        id: true,
+        comName: true,
+        interest: true,
+      },
+    });
+
+    //관심사 중 하나 일치하는 모임 조회하기
+    const Interest = interests.split(",");
+
+    const comInterest = await prisma.community.findMany({
+      select: {
+        interest: true,
+      },
+    });
+    console.log(comInterest.interest);
+
+    return res.status(201).json({ data: correctCom });
+  } catch (err) {
+    next(err);
+  }
+});
