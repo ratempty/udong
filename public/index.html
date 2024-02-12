@@ -11,7 +11,6 @@
 		<header>
 			<div class="header-left">로고</div>
 			<div class="header-right">
-				<span id="user-info"></span>
 				<button id="btn-login" data-modal-target="#modal-login">로그인</button>
 				<button id="btn-logout">로그아웃</button>
 				<button id="btn-signup" data-modal-target="#modal-signup">
@@ -94,7 +93,8 @@
 		<div id="modal-user-info" class="modal">
 			<div class="modal-content">
 				<span class="close">&times;</span>
-				<h2>내 정보 수정</h2>
+				<h2>내 정보</h2>
+				<img id="profile-image-display" src="" alt="프로필 이미지" />
 				<form id="userInfoForm">
 					<label for="user-email">이메일:</label>
 					<input type="email" id="user-email" name="email" required />
@@ -106,7 +106,7 @@
 					<input type="text" id="user-interest" name="interest" />
 
 					<label for="user-profile-image">프로필 이미지:</label>
-					<input type="file" id="user-profile-image" name="profile-image" />
+					<input type="file" id="user-profile-image" name="user-profile-image" />
 					<button type="submit" id="submit-user-info">수정</button>
 				</form>
 			</div>
