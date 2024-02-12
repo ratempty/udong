@@ -198,6 +198,10 @@ router.get("/recommendCom", authMiddleWare, async (req, res, next) => {
       },
     });
 
+    if (!userInterest) {
+      return res.status(401).json({ message: "관심사 정보를 추가해주십시오." });
+    }
+
     //2. 커뮤니티 관심사 모음
     const comInterest = await prisma.community.findMany({
       select: {
@@ -239,6 +243,7 @@ router.get("/recommendCom", authMiddleWare, async (req, res, next) => {
         id: true,
         comName: true,
         interest: true,
+        communityImage: true,
       },
     });
 
@@ -248,42 +253,40 @@ router.get("/recommendCom", authMiddleWare, async (req, res, next) => {
   }
 });
 
-//  //로그인이 안되어있거나, 관심사를 선택하지 않은 유저의 경우 랜덤으로 커뮤니티 조회하기
-//     //물어볼것: 로그인 하지 않은 유저의 경우를 쓰고싶은데, 같은 api를 쓰니 authmiddleware를
-//     //반드시 거쳐야하는 문제가 있음. 어떻게 해야 할까요?
-//     const comId = await prisma.community.findMany({
-// 		select: {
-// 		  id: true,
-// 		},
-// 	  });
+//로그인이 안되어있거나, 관심사를 선택하지 않은 유저의 경우 랜덤으로 커뮤니티 조회하기(첫화면)
+router.get("/community", async (req, res, next) => {
+  const comId = await prisma.community.findMany({
+    select: {
+      id: true,
+    },
+  });
 
-// 	  function Random() {
-// 		const randomId = comId.map((item) => item.id);
-// 		// Fisher-Yates 알고리즘을 사용하여 배열 랜덤 섞기
-// 		for (let i = randomId.length - 1; i > 0; i--) {
-// 		  const j = Math.floor(Math.random() * (i + 1));
-// 		  // 배열의 원소 위치 바꾸기
-// 		  [randomId[i], randomId[j]] = [randomId[j], randomId[i]];
-// 		}
-// 		return randomId;
-// 	  }
-// 	  const R = Random();
+  function Random() {
+    const randomId = comId.map((item) => item.id);
+    // Fisher-Yates 알고리즘을 사용하여 배열 랜덤 섞기
+    for (let i = randomId.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      // 배열의 원소 위치 바꾸기
+      [randomId[i], randomId[j]] = [randomId[j], randomId[i]];
+    }
+    return randomId;
+  }
+  const R = Random();
 
-// 	  if (!interestOutput || !userId) {
-// 		//현재 존재하는 모임을 랜덤으로 출력
-// 		const selectThirdId = R.slice(0, 3);
-// 		console.log("선택된 아이디:", selectThirdId);
-// 		const randomCommunity = await prisma.community.findMany({
-// 		  where: { id: { in: selectThirdId } },
-// 		  select: {
-// 			id: true,
-// 			comName: true,
-// 			interest: true,
-// 			communityImage: true,
-// 			manageId: true,
-// 		  },
-// 		});
-// 		return res.status(201).json({ data: randomCommunity });
-// 	  }
+  const selectId = R.slice(0, 7);
+  console.log(R, selectId);
+  const randomCommunity = await prisma.community.findMany({
+    where: { id: { in: selectId } },
+    orderBy: { id: "desc" },
+    select: {
+      id: true,
+      comName: true,
+      interest: true,
+      communityImage: true,
+      //   manageId: true,
+    },
+  });
+  return res.status(201).json({ data: randomCommunity });
+});
 
 export default router;
