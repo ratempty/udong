@@ -29,29 +29,28 @@ export function login(email, password) {
 		});
 }
 
-
 export function logout() {
 	fetch('/api/sign-out', {
-        method: 'POST', 
-        credentials: 'include', 
-    })
-	.then(response => {
-        if (!response.ok) {
-            throw new Error('로그아웃 처리 중 문제가 발생했습니다.');
-        }
-        return response.json(); 
-    })
-    .then(data => {
-        console.log(data.message); 
-		if (data.message === '성공적으로 로그아웃되었습니다.') { 
-            updateUIBeforeLogin(); 
-        } else {
-            alert('로그아웃 실패: ' + data.message);
-        }
-    })
-    .catch(error => {
-        console.error('로그아웃 요청 중 오류 발생:', error);
-    });
+		method: 'POST',
+		credentials: 'include',
+	})
+		.then((response) => {
+			if (!response.ok) {
+				throw new Error('로그아웃 처리 중 문제가 발생했습니다.');
+			}
+			return response.json();
+		})
+		.then((data) => {
+			console.log(data.message);
+			if (data.message === '성공적으로 로그아웃되었습니다.') {
+				updateUIBeforeLogin();
+			} else {
+				alert('로그아웃 실패: ' + data.message);
+			}
+		})
+		.catch((error) => {
+			console.error('로그아웃 요청 중 오류 발생:', error);
+		});
 }
 
 /**
@@ -118,37 +117,39 @@ export function fetchUserInfo() {
 }
 
 export function setupUserInfoForm() {
-	document.getElementById('userInfoForm').addEventListener('submit', function(event) {
-        event.preventDefault();
+	document
+		.getElementById('userInfoForm')
+		.addEventListener('submit', function (event) {
+			event.preventDefault();
 
-		const formData = new FormData(this);
-        const profileImage = document.getElementById('user-profile-image').files[0];
-		if (profileImage) {
-			formData.append('profileImage', profileImage);
-			formData.delete('user-profile-image');
-		}
+			const formData = new FormData(this);
+			const profileImage =
+				document.getElementById('user-profile-image').files[0];
+			if (profileImage) {
+				formData.append('profileImage', profileImage);
+				formData.delete('user-profile-image');
+			}
 
-		if (profileImage) {
-			for (const x of formData) {
-				console.log(x);
-			};
-		}
+			if (profileImage) {
+				for (const x of formData) {
+					console.log(x);
+				}
+			}
 
-        fetch('/api/users', { 
-            method: 'PATCH',
-            credentials: 'include', 
-            body: formData
-        })
-        .then(response => response.json())
-        .then(data => {
-            alert('사용자 정보가 성공적으로 업데이트되었습니다.');
-            closeModal();
-        })
-        .catch(error => {
-            console.error('정보 수정 중 에러 발생:', error);
-        });
-    });
-
+			fetch('/api/users', {
+				method: 'PATCH',
+				credentials: 'include',
+				body: formData,
+			})
+				.then((response) => response.json())
+				.then((data) => {
+					alert('사용자 정보가 성공적으로 업데이트되었습니다.');
+					closeModal();
+				})
+				.catch((error) => {
+					console.error('정보 수정 중 에러 발생:', error);
+				});
+		});
 }
 
 export function setupLoginListener() {
@@ -174,37 +175,40 @@ export function setupLogoutListener() {
 /**
  * 유저 정보 확인
  */
-export function myInfoListener(){
-	document.getElementById('btn-user-info').addEventListener('click', function(event) {
-        event.preventDefault();
-        
-        fetch('/api/users', {
-            method: 'GET', 
-            credentials: 'include',
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('프로필 정보를 불러오는데 실패했습니다.');
-            }
-            return response.json();
-        })
-        .then(data => {
-            console.log('받은 유저 정보:', data.data);
-			populateUserInfo(data.data); 
-        })
-        .catch(error => {
-            console.error('에러 발생:', error); // 에러 처리
-        });
-    });
+export function myInfoListener() {
+	document
+		.getElementById('btn-user-info')
+		.addEventListener('click', function (event) {
+			event.preventDefault();
+
+			fetch('/api/users', {
+				method: 'GET',
+				credentials: 'include',
+			})
+				.then((response) => {
+					if (!response.ok) {
+						throw new Error('프로필 정보를 불러오는데 실패했습니다.');
+					}
+					return response.json();
+				})
+				.then((data) => {
+					console.log('받은 유저 정보:', data.data);
+					populateUserInfo(data.data);
+				})
+				.catch((error) => {
+					console.error('에러 발생:', error); // 에러 처리
+				});
+		});
 }
 function populateUserInfo(userInfo) {
-    document.getElementById('user-email').value = userInfo.email;
-    document.getElementById('user-name').value = userInfo.name;
-    document.getElementById('user-interest').value = userInfo.interest || ''; 
+	document.getElementById('user-email').value = userInfo.email;
+	document.getElementById('user-name').value = userInfo.name;
+	document.getElementById('user-interest').value = userInfo.interest || '';
 	const profileImagePath = userInfo.profileImage;
 	const fullPath = `/uploads/profileImages/${profileImagePath}`;
-	document.getElementById('profile-image-display').src = fullPath || '기본 이미지 경로';
-    document.getElementById('modal-user-info').style.display = 'block';
+	document.getElementById('profile-image-display').src =
+		fullPath || '기본 이미지 경로';
+	document.getElementById('modal-user-info').style.display = 'block';
 }
 /**
  * 유저 로그인 확인
@@ -213,7 +217,7 @@ export function chkLogin() {
 	fetch('/api/sign-in-chk')
 		.then((response) => {
 			if (response.status === 401) {
-                console.log('로그인이 필요합니다.');
+				console.log('로그인이 필요합니다.');
 				updateUIBeforeLogin();
 				return '로그인하지 않은 유저';
 			} else if (!response.ok) {
@@ -224,13 +228,13 @@ export function chkLogin() {
 				myInfoListener();
 				setupUserInfoForm();
 			}
-			return response.json(); 
+			return response.json();
 		})
 		.then((data) => {
-			console.log('사용자 정보:', data); 
+			console.log('사용자 정보:', data);
 		})
 		.catch((error) => {
-			console.log(error.message); 
+			console.log(error.message);
 		});
 }
 
@@ -243,10 +247,10 @@ function loginSuccess() {
 
 // 모달 창 닫기 함수
 function closeModal() {
-	let modals = document.querySelectorAll('.modal'); 
-    modals.forEach(function(modal) {
-        modal.style.display = 'none'; 
-    });
+	let modals = document.querySelectorAll('.modal');
+	modals.forEach(function (modal) {
+		modal.style.display = 'none';
+	});
 }
 
 // 로그인 후 UI 업데이트 함수
@@ -259,7 +263,6 @@ function updateUIAfterLogin() {
 	if (logoutButton) logoutButton.style.display = 'inline-block';
 	if (userinfoButton) userinfoButton.style.display = 'inline-block';
 	if (signupButton) signupButton.style.display = 'none';
-
 }
 
 function updateUIBeforeLogin() {
