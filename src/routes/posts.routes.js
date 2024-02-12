@@ -29,6 +29,7 @@ router.post(
 					communityId: +communityId,
 					title: title,
 					content: content,
+					parentsId: 0,
 				},
 			});
 		} else {
