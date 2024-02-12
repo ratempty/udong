@@ -23,8 +23,8 @@
 		"nodemon": "^3.0.3"
 	},
 	"scripts": {
-		"dev" : "nodemon src/app.js",
-		"prtt" : "yarn prettier --write ."
+		"dev": "nodemon src/app.js",
+		"prtt": "yarn prettier --write ."
 	},
 	"repository": "https://github.com/ratempty/udong.git",
 	"author": "kimgrang <kimgrang1202@gmail.com>"
