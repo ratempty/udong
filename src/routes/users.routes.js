@@ -3,10 +3,9 @@ import bcrypt from 'bcrypt';
 import multer from 'multer';
 import { prisma } from '../utils/index.js';
 import { createAccessToken } from '../utils/token.js';
+import authMiddleWare from "../middleware/auth.middleware.js";
 import { fileURLToPath } from 'url';
 import path, { dirname } from 'path';
-import fs from 'fs';
-
 
 const router = express.Router();
 
@@ -100,7 +99,30 @@ router.post('/sign-in', async (req, res, next) => {
 });
 
 /**
- * 프로필 조회
+ * 본인 프로필 조회
+ */
+router.get('/users', authMiddleWare, async (req, res, next) => {
+	const loginId = req.user.id;
+
+	const user = await prisma.users.findFirst({
+		where: { id: +loginId },
+		select: {
+			name: true,
+			email: true,
+			interest: true,
+			profileImage: true,
+		},
+	});
+
+	if (!user) {
+		return res.status(404).json({ message: '존재하지 않는 유저입니다.' });
+	}
+
+	return res.status(200).json({ data: user });
+});
+
+/**
+ * 타인 프로필 조회
  */
 router.get('/users/:userId', async (req, res, next) => {
 	//const { userId } = req.user;
@@ -122,7 +144,6 @@ router.get('/users/:userId', async (req, res, next) => {
 
 	return res.status(200).json({ data: user });
 });
-
 /**
  * 본인 프로필 수정
  */
