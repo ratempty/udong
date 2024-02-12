@@ -1,3 +1,9 @@
+let loginButton = document.getElementById('btn-login');
+let logoutButton = document.getElementById('btn-logout');
+let signupButton = document.getElementById('btn-signup');
+let userinfoButton = document.getElementById('btn-user-info');
+let userInfo = document.getElementById('user-info');
+
 export function login(email, password) {
 	fetch('/api/sign-in', {
 		method: 'POST',
@@ -22,6 +28,31 @@ export function login(email, password) {
 		.catch((error) => {
 			console.error('로그인 요청 중 오류 발생:', error);
 		});
+}
+
+
+export function logout() {
+	fetch('/api/sign-out', {
+        method: 'POST', 
+        credentials: 'include', 
+    })
+	.then(response => {
+        if (!response.ok) {
+            throw new Error('로그아웃 처리 중 문제가 발생했습니다.');
+        }
+        return response.json(); 
+    })
+    .then(data => {
+        console.log(data.message); 
+		if (data.message === '성공적으로 로그아웃되었습니다.') { 
+            updateUIBeforeLogin(); 
+        } else {
+            alert('로그아웃 실패: ' + data.message);
+        }
+    })
+    .catch(error => {
+        console.error('로그아웃 요청 중 오류 발생:', error);
+    });
 }
 
 /**
@@ -94,9 +125,8 @@ export function setupUserInfoUpdateForm() {
 	document
 		.getElementById('userInfoForm')
 		.addEventListener('submit', function (e) {
-			e.preventDefault(); // 폼 기본 제출 동작 방지
-
-			// 폼 데이터를 JSON 객체로 수집
+			e.preventDefault(); 
+			
 			const userInfo = {
 				name: document.getElementById('user-name').value,
 				email: document.getElementById('user-email').value,
@@ -135,6 +165,40 @@ export function setupLoginListener() {
 			login(email, password);
 		});
 }
+export function setupLogoutListener() {
+	document
+		.getElementById('btn-logout')
+		.addEventListener('click', function (event) {
+			event.preventDefault();
+			logout();
+		});
+}
+
+
+/**
+ * 유저 로그인 확인
+ */
+export function chkLogin() {
+	fetch('/api/sign-in-chk')
+		.then((response) => {
+			if (response.status === 401) {
+                console.log('로그인이 필요합니다.');
+				updateUIBeforeLogin();
+				return '로그인하지 않은 유저';
+			} else if (!response.ok) {
+				throw new Error('서버에서 문제가 발생했습니다.');
+			} else {
+				updateUIAfterLogin();
+			}
+			return response.json(); 
+		})
+		.then((data) => {
+			console.log('사용자 정보:', data); 
+		})
+		.catch((error) => {
+			console.log(error.message); 
+		});
+}
 
 // 로그인 성공 후 모달 닫기 및 UI 업데이트
 function loginSuccess() {
@@ -157,7 +221,16 @@ function updateUIAfterLogin() {
 	let userInfo = document.getElementById('user-info');
 
 	if (loginButton) loginButton.style.display = 'none';
-	if (logoutButton) logoutButton.style.display = 'block';
+	if (logoutButton) logoutButton.style.display = 'inline-block';
+	if (userinfoButton) userinfoButton.style.display = 'inline-block';
+	if (signupButton) signupButton.style.display = 'none';
 
 	if (userInfo) userInfo.innerText = '환영합니다, [사용자 이름]!';
+}
+
+function updateUIBeforeLogin() {
+	if (loginButton) loginButton.style.display = 'inline-block';
+	if (userinfoButton) userinfoButton.style.display = 'none';
+	if (signupButton) signupButton.style.display = 'inline-block';
+	if (logoutButton) logoutButton.style.display = 'none';
 }
