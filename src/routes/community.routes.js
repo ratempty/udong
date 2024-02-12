@@ -181,64 +181,60 @@ router.get("/community/:communityId", async (req, res, next) => {
   }
 });
 
-//추천 모임 조회
 router.get("/recommendCom", authMiddleWare, async (req, res, next) => {
   try {
     const userId = req.user.id;
 
-    //로그인한 유저의 관심사 조회
-    const interestOutput = await prisma.users.findMany({
+    // ** 관심사가 하나라도 일치하는 모임 출력하기
+    // 1. 유저관심사 2. 커뮤니티 관심사 split(",")으로 나눈 배열을 for문 두개로 하나하나 비교하기
+    // 일치하는 경우, 일치관심사배열에 넣기
+    // 일치관심사 배열로 커뮤니티 조회하기
+
+    //1. 유저의 관심사 모음
+    const userInterest = await prisma.users.findMany({
       where: { id: +userId },
       select: {
         interest: true,
       },
     });
 
-    //로그인이 안되어있거나, 관심사를 선택하지 않은 유저의 경우 랜덤으로 커뮤니티 조회하기
-    //물어볼것: 로그인 하지 않은 유저의 경우를 쓰고싶은데, 같은 api를 쓰니 authmiddleware를
-    //반드시 거쳐야하는 문제가 있음. 어떻게 해야 할까요?
-    const comId = await prisma.community.findMany({
+    //2. 커뮤니티 관심사 모음
+    const comInterest = await prisma.community.findMany({
       select: {
-        id: true,
+        interest: true,
       },
     });
 
-    function Random() {
-      const randomId = comId.map((item) => item.id);
-      // Fisher-Yates 알고리즘을 사용하여 배열 랜덤 섞기
-      for (let i = randomId.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        // 배열의 원소 위치 바꾸기
-        [randomId[i], randomId[j]] = [randomId[j], randomId[i]];
+    //관심사 배열
+    const removeSpaces = (str) => str.split(" ").join("");
+    const userInterArr = removeSpaces(userInterest[0].interest).split(",");
+    const comInterArr = comInterest.map((item) =>
+      removeSpaces(item.interest).split(",")
+    );
+    // console.log(userInterArr, comInterArr);
+    const correctInter = [];
+    for (let i = 0; i < userInterArr.length; i++) {
+      for (let j = 0; j < comInterArr.length; j++) {
+        for (let k = 0; k < comInterArr[j].length; k++) {
+          if (userInterArr[i] === comInterArr[j][k]) {
+            correctInter.push(userInterArr[i]);
+            break;
+          }
+        }
       }
-      return randomId;
     }
-    const R = Random();
-
-    if (!interestOutput || !userId) {
-      //현재 존재하는 모임을 랜덤으로 출력
-      const selectThirdId = R.slice(0, 3);
-      console.log("선택된 아이디:", selectThirdId);
-      const randomCommunity = await prisma.community.findMany({
-        where: { id: { in: selectThirdId } },
-        select: {
-          id: true,
-          comName: true,
-          interest: true,
-          communityImage: true,
-          manageId: true,
-        },
-      });
-      return res.status(201).json({ data: randomCommunity });
-    }
-
-    const interests = interestOutput[0].interest;
-    // const interest = [...interests];
-    // console.log(interests);
+    const uniqueCorrectInter = [...new Set(correctInter)];
+    // console.log(uniqueCorrectInter);
 
     //관심사와 일치하는 모임 출력
     const correctCom = await prisma.community.findMany({
-      where: { interest: interests },
+      where: {
+        OR: uniqueCorrectInter.map((interest) => ({
+          interest: {
+            contains: interest,
+          },
+        })),
+      },
       select: {
         id: true,
         comName: true,
@@ -246,20 +242,48 @@ router.get("/recommendCom", authMiddleWare, async (req, res, next) => {
       },
     });
 
-    //관심사 중 하나 일치하는 모임 조회하기
-    const Interest = interests.split(",");
-
-    const comInterest = await prisma.community.findMany({
-      select: {
-        interest: true,
-      },
-    });
-    console.log(comInterest.interest);
-
     return res.status(201).json({ data: correctCom });
   } catch (err) {
     next(err);
   }
 });
+
+//  //로그인이 안되어있거나, 관심사를 선택하지 않은 유저의 경우 랜덤으로 커뮤니티 조회하기
+//     //물어볼것: 로그인 하지 않은 유저의 경우를 쓰고싶은데, 같은 api를 쓰니 authmiddleware를
+//     //반드시 거쳐야하는 문제가 있음. 어떻게 해야 할까요?
+//     const comId = await prisma.community.findMany({
+// 		select: {
+// 		  id: true,
+// 		},
+// 	  });
+
+// 	  function Random() {
+// 		const randomId = comId.map((item) => item.id);
+// 		// Fisher-Yates 알고리즘을 사용하여 배열 랜덤 섞기
+// 		for (let i = randomId.length - 1; i > 0; i--) {
+// 		  const j = Math.floor(Math.random() * (i + 1));
+// 		  // 배열의 원소 위치 바꾸기
+// 		  [randomId[i], randomId[j]] = [randomId[j], randomId[i]];
+// 		}
+// 		return randomId;
+// 	  }
+// 	  const R = Random();
+
+// 	  if (!interestOutput || !userId) {
+// 		//현재 존재하는 모임을 랜덤으로 출력
+// 		const selectThirdId = R.slice(0, 3);
+// 		console.log("선택된 아이디:", selectThirdId);
+// 		const randomCommunity = await prisma.community.findMany({
+// 		  where: { id: { in: selectThirdId } },
+// 		  select: {
+// 			id: true,
+// 			comName: true,
+// 			interest: true,
+// 			communityImage: true,
+// 			manageId: true,
+// 		  },
+// 		});
+// 		return res.status(201).json({ data: randomCommunity });
+// 	  }
 
 export default router;
