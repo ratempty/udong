@@ -2,29 +2,32 @@ import express from 'express';
 import bcrypt from 'bcrypt';
 import multer from 'multer';
 import { prisma } from '../utils/index.js';
-import { createAccessToken } from '../utils/token.js';
+import { createAccessToken, createVerifyToken } from '../utils/token.js';
 import authMiddleWare from '../middleware/auth.middleware.js';
 import { fileURLToPath } from 'url';
 import path, { dirname } from 'path';
 import fs from 'fs';
 import dotenv from 'dotenv';
-import sendMail from '../utils/nodemailer.js';
+import emailSender from '../utils/nodemailer.js';
 
 const router = express.Router();
 dotenv.config();
 
-router.post('/mail', async (req, res, next) => {
+router.post('/email', async (req, res, next) => {
 	const { email } = req.body;
-	const min = 111111;
-	const max = 999999;
-	const number = Math.floor(Math.random() * (max - min + 1)) + min;
-
-	await sendMail(email, number);
+	const user = await prisma.users.findUnique({ where: { email } });
+	const verifyToken = createVerifyToken(user.email);
+	res.cookie('verification', `Bearer ${verifyToken}`);
+	// const hashedemail = await bcrypt.hash(email, 10);
+	// const hashedverifyToken = await bcrypt.hash(verifyToken, 10);
+	// await emailSender(email, hashedverifyToken);
+	await emailSender(email, verifyToken);
 	try {
 		res.json({
 			ok: true,
 			msg: '이메일이 성공적으로 전송되었습니다.',
-			authNum: number,
+			// token: hashedverifyToken
+			token: verifyToken
 		});
 	} catch (error) {
 		console.error('이메일 전송에 실패했습니다:', error);
@@ -128,11 +131,8 @@ router.post('/sign-in', async (req, res, next) => {
  * 로그아웃
  */
 router.post('/sign-out', authMiddleWare, async (req, res, next) => {
-
 	try {
-		
 		res.clearCookie('authorization', { httpOnly: true, sameSite: 'strict' });
-
 		return res.status(200).json({ message: '성공적으로 로그아웃되었습니다.' });
 	} catch (error) {
 		return res
