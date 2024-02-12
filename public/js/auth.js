@@ -2,7 +2,6 @@ let loginButton = document.getElementById('btn-login');
 let logoutButton = document.getElementById('btn-logout');
 let signupButton = document.getElementById('btn-signup');
 let userinfoButton = document.getElementById('btn-user-info');
-let userInfo = document.getElementById('user-info');
 
 export function login(email, password) {
 	fetch('/api/sign-in', {
@@ -118,39 +117,38 @@ export function fetchUserInfo() {
 		.catch((error) => console.error('사용자 정보 조회 중 오류 발생:', error));
 }
 
-export function setupUserInfoUpdateForm() {
-	const userId = localStorage.getItem('id');
-	const accessToken = localStorage.getItem('accessToken');
+export function setupUserInfoForm() {
+	document.getElementById('userInfoForm').addEventListener('submit', function(event) {
+        event.preventDefault();
 
-	document
-		.getElementById('userInfoForm')
-		.addEventListener('submit', function (e) {
-			e.preventDefault(); 
-			
-			const userInfo = {
-				name: document.getElementById('user-name').value,
-				email: document.getElementById('user-email').value,
-				interest: document.getElementById('user-interest').value,
+		const formData = new FormData(this);
+        const profileImage = document.getElementById('user-profile-image').files[0];
+		if (profileImage) {
+			formData.append('profileImage', profileImage);
+			formData.delete('user-profile-image');
+		}
+
+		if (profileImage) {
+			for (const x of formData) {
+				console.log(x);
 			};
+		}
 
-			fetch(`/api/users/${userId}`, {
-				method: 'PATCH',
-				headers: {
-					'Content-Type': 'application/json',
-					Authorization: `Bearer ${accessToken}`, // Bearer 토큰 포함
-				},
-				body: JSON.stringify(userInfo),
-			})
-				.then((response) => response.json())
-				.then((data) => {
-					// 성공적으로 업데이트되었다는 메시지 표시 또는 모달 닫기
-					alert('사용자 정보가 성공적으로 업데이트되었습니다.');
-					document.getElementById('modal-user-info').style.display = 'none';
-				})
-				.catch((error) => {
-					console.error('사용자 정보 업데이트 중 오류 발생:', error);
-				});
-		});
+        fetch('/api/users', { 
+            method: 'PATCH',
+            credentials: 'include', 
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            alert('사용자 정보가 성공적으로 업데이트되었습니다.');
+            closeModal();
+        })
+        .catch(error => {
+            console.error('정보 수정 중 에러 발생:', error);
+        });
+    });
+
 }
 
 export function setupLoginListener() {
@@ -173,8 +171,41 @@ export function setupLogoutListener() {
 			logout();
 		});
 }
-
-
+/**
+ * 유저 정보 확인
+ */
+export function myInfoListener(){
+	document.getElementById('btn-user-info').addEventListener('click', function(event) {
+        event.preventDefault();
+        
+        fetch('/api/users', {
+            method: 'GET', 
+            credentials: 'include',
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('프로필 정보를 불러오는데 실패했습니다.');
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('받은 유저 정보:', data.data);
+			populateUserInfo(data.data); 
+        })
+        .catch(error => {
+            console.error('에러 발생:', error); // 에러 처리
+        });
+    });
+}
+function populateUserInfo(userInfo) {
+    document.getElementById('user-email').value = userInfo.email;
+    document.getElementById('user-name').value = userInfo.name;
+    document.getElementById('user-interest').value = userInfo.interest || ''; 
+	const profileImagePath = userInfo.profileImage;
+	const fullPath = `/uploads/profileImages/${profileImagePath}`;
+	document.getElementById('profile-image-display').src = fullPath || '기본 이미지 경로';
+    document.getElementById('modal-user-info').style.display = 'block';
+}
 /**
  * 유저 로그인 확인
  */
@@ -189,6 +220,9 @@ export function chkLogin() {
 				throw new Error('서버에서 문제가 발생했습니다.');
 			} else {
 				updateUIAfterLogin();
+				// 내정보 조회~
+				myInfoListener();
+				setupUserInfoForm();
 			}
 			return response.json(); 
 		})
@@ -203,15 +237,16 @@ export function chkLogin() {
 // 로그인 성공 후 모달 닫기 및 UI 업데이트
 function loginSuccess() {
 	closeModal();
+	chkLogin();
 	updateUIAfterLogin();
 }
 
 // 모달 창 닫기 함수
 function closeModal() {
-	let modal = document.querySelector('.modal');
-	if (modal) {
-		modal.style.display = 'none';
-	}
+	let modals = document.querySelectorAll('.modal'); 
+    modals.forEach(function(modal) {
+        modal.style.display = 'none'; 
+    });
 }
 
 // 로그인 후 UI 업데이트 함수
@@ -225,7 +260,6 @@ function updateUIAfterLogin() {
 	if (userinfoButton) userinfoButton.style.display = 'inline-block';
 	if (signupButton) signupButton.style.display = 'none';
 
-	if (userInfo) userInfo.innerText = '환영합니다, [사용자 이름]!';
 }
 
 function updateUIBeforeLogin() {
