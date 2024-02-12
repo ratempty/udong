@@ -3,13 +3,12 @@ import bcrypt from 'bcrypt';
 import multer from 'multer';
 import { prisma } from '../utils/index.js';
 import { createAccessToken } from '../utils/token.js';
-import authMiddleWare from "../middleware/auth.middleware.js";
+import authMiddleWare from '../middleware/auth.middleware.js';
 import { fileURLToPath } from 'url';
 import path, { dirname } from 'path';
 import fs from 'fs';
-import dotenv from "dotenv"
+import dotenv from 'dotenv';
 import sendMail from '../utils/nodemailer.js';
-
 
 const router = express.Router();
 dotenv.config();
@@ -22,7 +21,11 @@ router.post('/mail', async (req, res, next) => {
 
 	await sendMail(email, number);
 	try {
-		res.json({ ok: true, msg: '이메일이 성공적으로 전송되었습니다.', authNum: number });
+		res.json({
+			ok: true,
+			msg: '이메일이 성공적으로 전송되었습니다.',
+			authNum: number,
+		});
 	} catch (error) {
 		console.error('이메일 전송에 실패했습니다:', error);
 		res.status(500).json({ ok: false, msg: '이메일 전송에 실패했습니다.' });
@@ -37,8 +40,11 @@ const storage = multer.diskStorage({
 		cb(null, path.join(__dirname, '../../public/uploads/profileImages'));
 	},
 	filename: (req, file, cb) => {
-		cb(null, `${file.fieldname}-${Date.now()}${path.extname(file.originalname)}`);
-	}
+		cb(
+			null,
+			`${file.fieldname}-${Date.now()}${path.extname(file.originalname)}`,
+		);
+	},
 });
 
 const upload = multer({ storage: storage });
@@ -118,7 +124,6 @@ router.post('/sign-in', async (req, res, next) => {
 	}
 });
 
-
 /**
  * 로그아웃
  */
@@ -179,7 +184,6 @@ router.get('/users', authMiddleWare, async (req, res, next) => {
 
 	return res.status(200).json({ data: user });
 });
-
 
 /**
  * 타인 프로필 조회
