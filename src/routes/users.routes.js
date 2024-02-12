@@ -192,7 +192,6 @@ router.get('/users/:userId', async (req, res, next) => {
 		where: { id: +userId },
 		select: {
 			name: true,
-			email: true,
 			interest: true,
 			profileImage: true,
 		},
@@ -204,6 +203,7 @@ router.get('/users/:userId', async (req, res, next) => {
 
 	return res.status(200).json({ data: user });
 });
+
 /**
  * 본인 프로필 수정
  */
