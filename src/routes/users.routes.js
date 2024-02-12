@@ -127,32 +127,11 @@ router.post('/sign-in', async (req, res, next) => {
 /**
  * 로그아웃
  */
-router.post('/sign-out', async (req, res, next) => {
-	const { accessToken } = req.cookies;
-
-	if (!accessToken) {
-		return res
-			.status(400)
-			.json({ message: '로그아웃할 사용자 정보가 없습니다.' });
-	}
+router.post('/sign-out', authMiddleWare, async (req, res, next) => {
 
 	try {
-		// const existingToken = await prisma.refreshTokens.findUnique({
-		// 	where: { token: refreshToken },
-		// });
-
-		// if (existingToken) {
-		// 	await prisma.refreshTokens.delete({
-		// 		where: { token: refreshToken },
-		// 	});
-		// } else {
-		// 	return res
-		// 		.status(400)
-		// 		.json({ message: '로그아웃할 사용자 정보가 없습니다.' });
-		// }
-
-		res.clearCookie('accessToken');
-		// res.clearCookie('refreshToken');
+		
+		res.clearCookie('authorization', { httpOnly: true, sameSite: 'strict' });
 
 		return res.status(200).json({ message: '성공적으로 로그아웃되었습니다.' });
 	} catch (error) {
@@ -160,6 +139,13 @@ router.post('/sign-out', async (req, res, next) => {
 			.status(500)
 			.json({ message: '서버 오류가 발생했습니다.', error: error.message });
 	}
+});
+
+/**
+ * 로그인 체크
+ */
+router.get('/sign-in-chk', authMiddleWare, (req, res) => {
+	return res.status(200).json({ message: '로그인 중...' });
 });
 
 /**

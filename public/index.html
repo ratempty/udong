@@ -11,9 +11,9 @@
 		<header>
 			<div class="header-left">로고</div>
 			<div class="header-right">
-				<p id="user-info"></p>
+				<span id="user-info"></span>
 				<button id="btn-login" data-modal-target="#modal-login">로그인</button>
-				<button>로그아웃</button>
+				<button id="btn-logout">로그아웃</button>
 				<button id="btn-signup" data-modal-target="#modal-signup">
 					회원가입
 				</button>
@@ -25,14 +25,11 @@
 		<button class="create-community-button">모임 개설하기</button>
 		<nav class="community-nav">
 			<div class="nav-images">
-				<!-- 소모임 이미지들 -->
 				<img src="image1.jpg" alt="소모임1" />
 				<img src="image2.jpg" alt="소모임2" />
-				<!-- 여러 소모임 이미지들을 추가하세요 -->
 			</div>
 		</nav>
 		<div class="content">
-			<!-- 콘텐츠 내용 -->
 			<p>여기에 콘텐츠 내용이 들어갑니다.</p>
 		</div>
 		<footer>
@@ -108,11 +105,9 @@
 					<label for="user-interest">관심사:</label>
 					<input type="text" id="user-interest" name="interest" />
 
-					<!-- 프로필 이미지를 수정할 수 있게 파일 입력 필드 추가 -->
 					<label for="user-profile-image">프로필 이미지:</label>
 					<input type="file" id="user-profile-image" name="profile-image" />
-					<!-- 정보 수정 완료 버튼 -->
-					<button type="submit" id="submit-user-info">수정 완료</button>
+					<button type="submit" id="submit-user-info">수정</button>
 				</form>
 			</div>
 		</div>

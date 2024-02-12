@@ -1,9 +1,10 @@
-import { setupLoginListener, setupSignupForm, fetchUserInfo } from './auth.js';
+import { setupLoginListener, setupSignupForm, setupLogoutListener, chkLogin } from './auth.js';
 import { setupModalListeners } from './modal.js';
 
 document.addEventListener('DOMContentLoaded', function () {
 	setupModalListeners();
 	setupLoginListener();
+    setupLogoutListener();
 	setupSignupForm();
-	fetchUserInfo();
+	chkLogin();
 });
