@@ -6,20 +6,38 @@ import { createAccessToken } from '../utils/token.js';
 import { fileURLToPath } from 'url';
 import path, { dirname } from 'path';
 import fs from 'fs';
+import dotenv from "dotenv"
+import sendMail from '../utils/nodemailer.js';
 
 
 const router = express.Router();
+dotenv.config();
+
+router.post('/mail', async (req, res, next) => {
+	const { email } = req.body;
+	const min = 111111;
+	const max = 999999;
+	const number = Math.floor(Math.random() * (max - min + 1)) + min;
+
+	await sendMail(email, number);
+	try {
+		res.json({ ok: true, msg: '이메일이 성공적으로 전송되었습니다.', authNum: number });
+	} catch (error) {
+		console.error('이메일 전송에 실패했습니다:', error);
+		res.status(500).json({ ok: false, msg: '이메일 전송에 실패했습니다.' });
+	}
+});
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, path.join(__dirname, '../../public/uploads/profileImages'));
-    },
-    filename: (req, file, cb) => {
-        cb(null, `${file.fieldname}-${Date.now()}${path.extname(file.originalname)}`);
-    }
+	destination: (req, file, cb) => {
+		cb(null, path.join(__dirname, '../../public/uploads/profileImages'));
+	},
+	filename: (req, file, cb) => {
+		cb(null, `${file.fieldname}-${Date.now()}${path.extname(file.originalname)}`);
+	}
 });
 
 const upload = multer({ storage: storage });
@@ -96,6 +114,44 @@ router.post('/sign-in', async (req, res, next) => {
 		return res.status(200).json({ message: '로그인 성공' });
 	} catch (err) {
 		next(err);
+	}
+});
+
+/**
+ * 로그아웃
+ */
+router.post('/sign-out', async (req, res, next) => {
+	const { accessToken } = req.cookies;
+
+	if (!accessToken) {
+		return res
+			.status(400)
+			.json({ message: '로그아웃할 사용자 정보가 없습니다.' });
+	}
+
+	try {
+		// const existingToken = await prisma.refreshTokens.findUnique({
+		// 	where: { token: refreshToken },
+		// });
+
+		// if (existingToken) {
+		// 	await prisma.refreshTokens.delete({
+		// 		where: { token: refreshToken },
+		// 	});
+		// } else {
+		// 	return res
+		// 		.status(400)
+		// 		.json({ message: '로그아웃할 사용자 정보가 없습니다.' });
+		// }
+
+		res.clearCookie('accessToken');
+		// res.clearCookie('refreshToken');
+
+		return res.status(200).json({ message: '성공적으로 로그아웃되었습니다.' });
+	} catch (error) {
+		return res
+			.status(500)
+			.json({ message: '서버 오류가 발생했습니다.', error: error.message });
 	}
 });
 
