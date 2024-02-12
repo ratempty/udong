@@ -154,6 +154,8 @@ router.get("/community/:communityId", async (req, res, next) => {
       return res.status(404).json({ message: "표시할 게시글이 없습니다." });
     }
 
+    const result = await likecounter(findPosts.id);
+
     const posts = await prisma.posts.findMany({
       where: {
         communityId: +communityId,
@@ -178,8 +180,6 @@ router.get("/community/:communityId", async (req, res, next) => {
     next(err);
   }
 });
-
-export default router;
 
 //추천 모임 조회
 router.get("/recommendCom", authMiddleWare, async (req, res, next) => {
@@ -261,3 +261,5 @@ router.get("/recommendCom", authMiddleWare, async (req, res, next) => {
     next(err);
   }
 });
+
+export default router;
