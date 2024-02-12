@@ -21,6 +21,8 @@ model Users {
   postId      Posts[]
   Likes       Likes[]
   CommunityUsers CommunityUsers[]
+  followers        Follow[]  @relation("UserFollowers")
+  following        Follow[]  @relation("UserFollowing")
 
   @@map("Users")
 }
@@ -79,4 +81,14 @@ model Likes {
   posts Posts @relation(fields:[postId] , references: [id] , onDelete: Cascade)
 
   @@map("Likes")
+}
+model Follow {
+  id          Int         @id @default(autoincrement()) @map("id")
+  followerId  Int         @map("followerId")
+  followingId Int         @map("followingId")
+
+  follower    Users @relation("UserFollowers", fields: [followerId], references: [id], onDelete: Cascade)
+  following   Users @relation("UserFollowing", fields: [followingId], references: [id], onDelete: Cascade)
+
+  @@map("Follow")
 }

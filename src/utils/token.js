@@ -27,6 +27,6 @@ export function createVerifyToken(email) {
 
 export function createRefreshToken(id) {
 	return jwt.sign({ id }, process.env.CUSTOM_SECRET_KEY, {
-		expiresIn: '12h'
+		expiresIn: '12h',
 	});
 }

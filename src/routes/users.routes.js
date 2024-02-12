@@ -27,7 +27,7 @@ router.post('/email', async (req, res, next) => {
 			ok: true,
 			msg: '이메일이 성공적으로 전송되었습니다.',
 			// token: hashedverifyToken
-			token: verifyToken
+			token: verifyToken,
 		});
 	} catch (error) {
 		console.error('이메일 전송에 실패했습니다:', error);
@@ -197,47 +197,61 @@ router.get('/users/:userId', async (req, res, next) => {
 /**
  * 본인 프로필 수정
  */
-router.patch('/users', authMiddleWare, upload.single('profileImage'), async (req, res, next) => {
+router.patch(
+	'/users',
+	authMiddleWare,
+	upload.single('profileImage'),
+	async (req, res, next) => {
+		const loginId = req.user.id;
+		const { name, email, interest } = req.body;
+		const profileImage = req.file ? req.file.filename : null;
 
-	const loginId = req.user.id;
-	const { name, email, interest } = req.body;
-	const profileImage = req.file ? req.file.filename : null;
-	
-	try {
-		const existUser = await prisma.users.findUnique({
-			where: { id: +loginId },
-		});
-
-		if (!existUser) {
-			return res.status(404).json({ message: '존재하지 않는 유저입니다.' });
-		}
-
-		if(profileImage && existUser.profileImage) {
-			fs.unlink(path.join(__dirname, '../../public/uploads/profileImages', existUser.profileImage), (err) => {
-				if (err) console.log("기존 프로필 사진 삭제 불가:", err);
-				else console.log("기존 프로필 사진 성공적으로 삭제");
+		try {
+			const existUser = await prisma.users.findUnique({
+				where: { id: +loginId },
 			});
+
+			if (!existUser) {
+				return res.status(404).json({ message: '존재하지 않는 유저입니다.' });
+			}
+
+			if (profileImage && existUser.profileImage) {
+				fs.unlink(
+					path.join(
+						__dirname,
+						'../../public/uploads/profileImages',
+						existUser.profileImage,
+					),
+					(err) => {
+						if (err) console.log('기존 프로필 사진 삭제 불가:', err);
+						else console.log('기존 프로필 사진 성공적으로 삭제');
+					},
+				);
+			}
+
+			const updatedUser = await prisma.users.update({
+				where: { id: +loginId },
+				data: {
+					...(name && { name }),
+					...(email && { email }),
+					...(interest && { interest }),
+					...(profileImage && { profileImage: profileImage }),
+				},
+			});
+
+			return res.status(200).json({
+				message: '회원정보가 정상 수정되었습니다.',
+				user: updatedUser,
+			});
+		} catch (error) {
+			return res
+				.status(500)
+				.json({
+					message: '서버 오류가 발생했습니다.' + error.message,
+					error: error.message,
+				});
 		}
-
-		const updatedUser = await prisma.users.update({
-			where: { id: +loginId },
-			data: {
-				...(name && { name }),
-				...(email && { email }),
-				...(interest && { interest }),
-                ...(profileImage && { profileImage: profileImage }), 
-			},
-		});
-
-		return res.status(200).json({
-			message: '회원정보가 정상 수정되었습니다.',
-			user: updatedUser,
-		});
-	} catch (error) {
-		return res
-			.status(500)
-			.json({ message: '서버 오류가 발생했습니다.'+error.message, error: error.message });
-	}
-});
+	},
+);
 
 export default router;
