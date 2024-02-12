@@ -21,6 +21,9 @@ export function setupModalListeners() {
 	document.getElementById('btn-signup').addEventListener('click', function () {
 		openModal(this.getAttribute('data-modal-target'));
 	});
+	document.getElementById('btn-user-info').addEventListener('click', function () {
+		openModal(this.getAttribute('data-modal-target'));
+	});
 
 	// 닫기 버튼에 이벤트 리스너 추가
 	let closeButtons = document.querySelectorAll('.close');
