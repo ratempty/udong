@@ -4,7 +4,7 @@ import {
 	setupSignupForm,
 	setupLogoutListener,
 	chkLogin,
-	verifyEmail
+	verifyEmail,
 } from './auth.js';
 import { setupModalListeners } from './modal.js';
 
