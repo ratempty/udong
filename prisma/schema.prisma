@@ -17,6 +17,7 @@ model Users {
   name        String    @map("name")
   interest    String    @map("interest") 
   profileImage String?   @map("profileImage")
+  isVerified  Boolean   @default(false) @map("isVerified") 
 
   postId      Posts[]
   Likes       Likes[]

@@ -35,6 +35,13 @@ router.post('/email', async (req, res, next) => {
 	}
 });
 
+router.get("/verify-email", async (req, res) => {
+	const email = req.query.email
+	const token = req.query.token
+	res.json({ email: email, token: token })
+
+})
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
