@@ -26,7 +26,12 @@ export function setupModalListeners() {
 		.addEventListener('click', function () {
 			openModal(this.getAttribute('data-modal-target'));
 		});
-
+	const postBtn = document.getElementById('btn-post');
+	if (postBtn) {
+		postBtn.addEventListener('click', function () {
+			openModal(this.getAttribute('data-modal-target'));
+		});
+	}
 	// 닫기 버튼에 이벤트 리스너 추가
 	let closeButtons = document.querySelectorAll('.close');
 	closeButtons.forEach(function (button) {
