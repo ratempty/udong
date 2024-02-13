@@ -116,6 +116,43 @@ export function fetchUserInfo() {
 		.catch((error) => console.error('사용자 정보 조회 중 오류 발생:', error));
 }
 
+export function verifyEmail() {
+	document.getElementById('verify-user').addEventListener('click', function (event) {
+		event.preventDefault();
+		const emailInput = document.getElementById('user-email');
+		const email = emailInput.value;
+
+		// Check if email is not empty
+		if (email.trim() !== '') {
+			fetch('/api/email', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify({
+					email: email
+				})
+			})
+				.then((response) => {
+					if (response.ok) {
+						return response.json();
+					}
+					throw new Error('네트워크 에러 발생');
+				})
+				.then((data) => {
+					alert('이메일 발송 완료.');
+					closeModal();
+					fetchUserInfo();
+				})
+				.catch((error) => {
+					console.error('이메일 발송 오류:', error);
+				});
+		} else {
+			console.error('email이 비어있습니다.');
+		}
+	});
+}
+
 export function setupUserInfoForm() {
 	document
 		.getElementById('userInfoForm')
