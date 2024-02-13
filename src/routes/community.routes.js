@@ -180,6 +180,51 @@ router.get('/community/post/:communityId', async (req, res, next) => {
 	}
 });
 
+//좋아요 받은 글 최신순으로 표시(첫화면)
+router.get('/postlike', async (req, res, next) => {
+	//좋아요 받은 글 찾아서 최신순으로표시
+	try {
+		const postlike = await prisma.posts.findMany({
+			where: {
+				parentsId: {
+					gt: 0,
+				},
+			},
+			select: {
+				id: true,
+				title: true,
+				content: true,
+				parentsId: true,
+				createdAt: true,
+			},
+			orderBy: {
+				createdAt: 'desc',
+			},
+		});
+
+		//표시할 글이 없을 경우 최신순으로 게시글 조회
+		if (postlike.length === 0) {
+			const post = await prisma.posts.findMany({
+				select: {
+					id: true,
+					title: true,
+					content: true,
+					parentsId: true,
+					createdAt: true,
+				},
+				orderBy: {
+					createdAt: 'desc',
+				},
+			});
+			return res.status(201).json({ data: post });
+		}
+
+		return res.status(201).json({ data: postlike });
+	} catch (err) {
+		next(err);
+	}
+});
+
 router.get('/recommendCom', authMiddleWare, async (req, res, next) => {
 	try {
 		const userId = req.user.id;
