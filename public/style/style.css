@@ -1,129 +1,92 @@
 body {
 	font-family: Arial, sans-serif;
 }
-header,
-nav,
-footer {
+
+header, nav, footer {
 	padding: 20px;
 	text-align: center;
 }
+
 .header-left {
 	float: left;
+}
+.header-left img {
+	max-width: 35px;
 }
 .header-right {
 	float: right;
 }
-.nav-images {
-	display: flex;
-	overflow-x: auto;
-}
-.nav-images img {
-	max-width: 100px;
-	margin: 10px;
-}
-.content,
-.footer {
-	clear: both;
-	text-align: center;
+
+.header-right button, .main button {
+	background-color: #007bff;
+	color: white;
+	border: none;
+	padding: 10px 20px;
+	margin: 0 5px;
+	border-radius: 5px;
+	cursor: pointer;
+	transition: background-color 0.3s ease;
 }
 
-/**************************
-* Header
-**************************/
-/* 헤더 버튼 스타일 */
-#logo {
-	width: 100px;
-	height: 100px;
-}
-.header-right button,
-.main button {
-	background-color: #007bff; /* 파란색 배경 */
-	color: white; /* 흰색 텍스트 */
-	border: none; /* 테두리 제거 */
-	padding: 10px 20px; /* 상하 10px, 좌우 20px 패딩 */
-	margin: 0 5px; /* 좌우 마진 5px */
-	border-radius: 5px; /* 둥근 모서리 */
-	cursor: pointer; /* 마우스 오버 시 커서 변경 */
-	transition: background-color 0.3s ease; /* 배경색 변경 애니메이션 */
+.header-right button:hover, .main button:hover {
+	background-color: #0056b3;
 }
 
-/* 마우스 호버 시 버튼 스타일 */
-.header-right button:hover,
-.main button:hover {
-	background-color: #0056b3; /* 어두운 파란색 배경 */
-}
-
-/* 포커스 시 (키보드 접근성) */
 .header-right button:focus {
-	outline: none; /* 기본 아웃라인 제거 */
-	box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.5); /* 파란색 테두리 쉐도우 */
+	outline: none;
+	box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.5);
 }
 
-/* 모임 개설하기 버튼 스타일 */
 .create-community-button {
-	background-color: #28a745; /* 녹색 배경 */
-	color: white; /* 흰색 텍스트 */
-	border: none; /* 테두리 제거 */
-	padding: 12px 24px; /* 상하 12px, 좌우 24px 패딩 */
-	font-size: 16px; /* 폰트 크기 */
-	font-weight: bold; /* 폰트 두께 */
-	border-radius: 8px; /* 둥근 모서리 */
-	cursor: pointer; /* 마우스 오버 시 커서 변경 */
-	transition:
-		background-color 0.3s,
-		transform 0.2s; /* 배경색 및 변형 애니메이션 */
-	display: inline-block; /* 인라인 블록 요소로 표시 */
-	margin: 20px 0; /* 상하 마진 20px */
-}
-/* 마우스 호버 시 버튼 스타일 */
-.create-community-button:hover {
-	background-color: #218838; /* 어두운 녹색 배경 */
-	transform: scale(1.05); /* 버튼 확대 */
-}
-/* 포커스 시 (키보드 접근성) */
-.create-community-button:focus {
-	outline: none; /* 기본 아웃라인 제거 */
-	box-shadow: 0 0 0 2px rgba(40, 167, 69, 0.5); /* 녹색 테두리 쉐도우 */
+	background-color: #28a745;
+	color: white;
+	border: none;
+	padding: 12px 24px;
+	font-size: 16px;
+	font-weight: bold;
+	border-radius: 8px;
+	cursor: pointer;
+	transition: background-color 0.3s, transform 0.2s;
+	display: block;
+	margin: 20px 0;
 }
 
-/**************************
-* Nav
-**************************/
+.create-community-button:hover {
+	background-color: #218838;
+	transform: scale(1.05);
+}
+
 .community-nav {
 	display: flex;
 	overflow-x: auto;
 	white-space: nowrap;
 	padding: 20px 0;
 	margin: 10px 0;
-	-webkit-overflow-scrolling: touch; /* iOS Safari에서 스크롤 모멘텀을 활성화 */
-	scrollbar-width: thin; /* Firefox에서 스크롤바 폭을 줄임 */
-	scrollbar-color: #888 #f0f0f0; /* Firefox에서 스크롤바 색상을 변경 */
+	-webkit-overflow-scrolling: touch;
+	scrollbar-width: thin;
+	scrollbar-color: #888 #f0f0f0;
 }
 
 .community-nav::-webkit-scrollbar {
-	height: 8px; /* Chrome, Safari, Opera에서 스크롤바 높이 설정 */
+	height: 8px;
 }
 
 .community-nav::-webkit-scrollbar-thumb {
-	background: #888; /* Chrome, Safari, Opera에서 스크롤바 썸 색상 설정 */
+	background: #888;
 }
 
 .community-nav::-webkit-scrollbar-track {
-	background: #f0f0f0; /* Chrome, Safari, Opera에서 스크롤바 트랙 색상 설정 */
+	background: #f0f0f0;
 }
 
 .community-nav img {
-	max-width: 100%; /* 이미지가 컨테이너를 넘어가지 않도록 함 */
-	max-height: 120px; /* 이미지 높이 설정 */
-	object-fit: cover; /* 이미지 비율 유지 */
-	margin-right: 20px; /* 이미지 사이의 간격 */
-	border-radius: 10px; /* 이미지 모서리 둥글게 */
+	max-width: 100%;
+	max-height: 120px;
+	object-fit: cover;
+	margin-right: 20px;
+	border-radius: 10px;
 }
 
-/**************************
-* Modal
-**************************/
-/* 모달 전체 스타일 */
 .modal {
 	display: none;
 	position: fixed;
@@ -136,7 +99,6 @@ footer {
 	background-color: rgba(0, 0, 0, 0.4);
 }
 
-/* 모달 내용 스타일 */
 .modal-content {
 	position: relative;
 	background-color: #fff;
@@ -148,20 +110,13 @@ footer {
 	max-width: 500px;
 }
 
-/* 모달 내 폼 스타일 */
 .modal-content form {
 	display: flex;
 	flex-direction: column;
 	gap: 15px;
 }
 
-.modal-content form label {
-	font-weight: bold;
-	margin-bottom: 5px;
-}
-
-.modal-content form input,
-.modal-content form button {
+.modal-content form input, .modal-content form button {
 	padding: 10px;
 	margin: 5px 0;
 	border-radius: 5px;
@@ -180,7 +135,6 @@ footer {
 	background-color: #0056b3;
 }
 
-/* 닫기 버튼 스타일 */
 .close {
 	color: #aaa;
 	position: absolute;
@@ -194,33 +148,17 @@ footer {
 .close:hover {
 	color: #000;
 }
-/* 닫기 버튼 스타일 */
-.close {
-	color: #aaa;
-	float: right;
-	font-size: 28px;
-	font-weight: bold;
-}
 
-.close:hover,
-.close:focus {
-	color: black;
-	text-decoration: none;
-	cursor: pointer;
-}
-
-/* 프로필 이미지 */
 #profile-image-display {
 	max-width: 100%;
 }
 
-/****************************
-* 서브페이지
-****************************/
 .user-info-view {
 	display: flex;
 	justify-content: center;
 	margin-top: 50px;
+	flex-direction: column;
+	align-items: center;
 }
 
 .user-profile {
@@ -240,6 +178,9 @@ footer {
 
 .user-actions {
 	margin-top: 20px;
+	display: flex;
+    flex-direction: column;
+    align-items: flex-start; 
 }
 
 .action-button {
@@ -252,34 +193,56 @@ footer {
 	margin: 5px;
 }
 
-#btn-follow {
+#btn-follow, #btn-unfollow {
 	background-color: #4caf50;
 	color: white;
+	padding: 10px 15px;
+	border: none;
+	border-radius: 5px;
+	cursor: pointer;
+    margin: 10px auto;
 }
 
 #btn-unfollow {
 	background-color: #f44336;
+}
+
+.user-following-section, .user-followers-section {
+	margin-top: 20px;
+}
+
+.toggle-button {
+	background-color: #007bff;
 	color: white;
+	padding: 10px 15px;
+	border: none;
+	border-radius: 5px;
+	cursor: pointer;
+	display: block;
+    margin: 0 auto;
+	margin-bottom: 20px;
+}
+
+.toggle-button:hover {
+	background-color: #0056b3;
+}
+
+.follow-list {
+	list-style: none;
+	padding: 0;
+	margin: 0;
+    width: 100%; 
+}
+.follow-list li {
+	border-bottom: 1px solid #ccc;
+	padding: 8px;
+	cursor: pointer;
+}
+
+.follow-list li:hover {
+	background-color: #f0f0f0;
 }
 
 .hidden {
 	display: none;
-}
-
-.header {
-	margin-bottom: 50px;
-}
-.section {
-	width: 100vw;
-	height: 20vh;
-	display: flex;
-	flex-flow: row nowrap;
-	gap: 30px;
-	padding-left: 50px;
-	margin-bottom: 30px;
-}
-.main {
-	width: 100vw;
-	height: auto;
-	padding: 50px;
 }
