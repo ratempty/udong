@@ -43,7 +43,7 @@ export function logout() {
 		.then((data) => {
 			console.log(data.message);
 			if (data.message === '성공적으로 로그아웃되었습니다.') {
-				updateUIBeforeLogin();
+				location.reload();
 			} else {
 				alert('로그아웃 실패: ' + data.message);
 			}
@@ -198,7 +198,7 @@ export function setupLogoutListener() {
 /**
  * 유저 정보 확인
  */
-export function myInfoListener() {
+export function myInfoListener(options =  {}) {
 	document
 		.getElementById('btn-user-info')
 		.addEventListener('click', function (event) {
@@ -215,28 +215,46 @@ export function myInfoListener() {
 					return response.json();
 				})
 				.then((data) => {
-					populateUserInfo(data.data);
+					populateUserInfo(data.data, options);
 				})
 				.catch((error) => {
-					console.error('에러 발생:', error); // 에러 처리
+					console.error('에러 발생:', error); 
 				});
 		});
 }
-function populateUserInfo(userInfo) {
-	document.getElementById('user-email').value = userInfo.email;
-	document.getElementById('user-name').value = userInfo.name;
-	document.getElementById('user-interest').value = userInfo.interest || '';
-	const profileImagePath = userInfo.profileImage;
-	const profileImageDisplay = document.getElementById('profile-image-display');
-	if (profileImagePath) {
-		const fullPath = `/uploads/profileImages/${profileImagePath}`;
-		profileImageDisplay.src = fullPath || '기본 이미지 경로';
-	} else {
-		profileImageDisplay.parentNode.removeChild(profileImageDisplay);
-	}
-	document.getElementById('modal-user-info').style.display = 'block';
-}
+function populateUserInfo(userInfo, options = {}) {
+    const {
+        emailSelector = 'user-email',
+        nameSelector = 'user-name',
+        interestSelector = 'user-interest',
+        profileImageSelector = 'profile-image-display',
+        profileImagePathPrefix = '/uploads/profileImages/',
+        defaultProfileImage = '기본 이미지 경로',
+        modalSelector = 'modal-user-info'
+    } = options;
 
+    // 이메일, 이름, 관심사 설정
+    if (document.getElementById(emailSelector)) {
+        document.getElementById(emailSelector).value = userInfo.email || '';
+    }
+    document.getElementById(nameSelector).value = userInfo.name;
+    document.getElementById(interestSelector).value = userInfo.interest || '';
+
+    // 프로필 이미지 설정
+    const profileImageDisplay = document.getElementById(profileImageSelector);
+    if (profileImageDisplay) {
+        if (userInfo.profileImage) {
+            const fullPath = `${profileImagePathPrefix}${userInfo.profileImage}`;
+            profileImageDisplay.src = fullPath;
+        } else {
+            profileImageDisplay.src = defaultProfileImage;
+        }
+    }
+
+    if (modalSelector && document.getElementById(modalSelector)) {
+        document.getElementById(modalSelector).style.display = 'block';
+    }
+}
 /**
  * 유저 로그인 확인
  */

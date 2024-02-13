@@ -174,9 +174,10 @@ router.get('/users', authMiddleWare, async (req, res, next) => {
 /**
  * 타인 프로필 조회
  */
-router.get('/users/:userId', async (req, res, next) => {
-	//const { userId } = req.user;
+router.get('/users/:userId', authMiddleWare, async (req, res, next) => {
+	
 	const { userId } = req.params;
+	const { loginId } = req.user.id;
 
 	const user = await prisma.users.findFirst({
 		where: { id: +userId },
@@ -187,11 +188,21 @@ router.get('/users/:userId', async (req, res, next) => {
 		},
 	});
 
+	const isFollowing = await prisma.follow.findFirst({
+		where: {
+			followerId: loginId,
+			followingId: +userId,
+		},
+	});
+
 	if (!user) {
 		return res.status(404).json({ message: '존재하지 않는 유저입니다.' });
 	}
-
-	return res.status(200).json({ data: user });
+	return res.status(200).json({
+		data: user,
+		loginMatch: +req.user.id === +userId ? true : false,
+		isFollowing: isFollowing !== null,
+	});
 });
 
 /**
