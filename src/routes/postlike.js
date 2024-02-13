@@ -27,7 +27,7 @@ router.post('/like/:postId', authMiddleWare, async (req, res, next) => {
 		//내 게시글은 좋아요 안되게 => 해당 포스트 작성자 아이디와 req.user id가 일치할 경우 안되게
 		if (Findpost.userId == +id) {
 			return res
-				.status(402)
+				.status(403)
 				.json({ message: '자신이 쓴 게시글은 좋아요를 누를 수 없습니다!!!' });
 		}
 		//아이디에 해당하는 포스트를 찾아서,
@@ -56,7 +56,7 @@ router.post('/like/:postId', authMiddleWare, async (req, res, next) => {
 			});
 		} else {
 			return res
-				.status(402)
+				.status(403)
 				.json({ message: '좋아요는 한번만 누를 수 있습니다.' });
 		}
 
@@ -99,7 +99,7 @@ router.delete('/like/:postId', authMiddleWare, async (req, res, next) => {
 				},
 			});
 		} else {
-			return res.status(402).json({ message: '좋아요 기록이 없습니다.' });
+			return res.status(404).json({ message: '좋아요 기록이 없습니다.' });
 		}
 		return res.status(200).json({ message: '싫어요' });
 	} catch (err) {

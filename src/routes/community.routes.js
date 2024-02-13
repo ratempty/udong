@@ -120,7 +120,7 @@ router.post(
 		});
 		if (User) {
 			return res
-				.status(404)
+				.status(409)
 				.json({ message: '이미 모임에 가입된 사용자 입니다.' });
 		}
 
@@ -177,7 +177,52 @@ router.get('/community/post/:communityId', async (req, res, next) => {
 			},
 		});
 
-		return res.status(201).json({ data: posts });
+		return res.status(200).json({ data: posts });
+	} catch (err) {
+		next(err);
+	}
+});
+
+//좋아요 받은 글 최신순으로 표시(첫화면)
+router.get('/postlike', async (req, res, next) => {
+	//좋아요 받은 글 찾아서 최신순으로표시
+	try {
+		const postlike = await prisma.posts.findMany({
+			where: {
+				parentsId: {
+					gt: 0,
+				},
+			},
+			select: {
+				id: true,
+				title: true,
+				content: true,
+				parentsId: true,
+				createdAt: true,
+			},
+			orderBy: {
+				createdAt: 'desc',
+			},
+		});
+
+		//표시할 글이 없을 경우 최신순으로 게시글 조회
+		if (postlike.length === 0) {
+			const post = await prisma.posts.findMany({
+				select: {
+					id: true,
+					title: true,
+					content: true,
+					parentsId: true,
+					createdAt: true,
+				},
+				orderBy: {
+					createdAt: 'desc',
+				},
+			});
+			return res.status(200).json({ data: post });
+		}
+
+		return res.status(200).json({ data: postlike });
 	} catch (err) {
 		next(err);
 	}
@@ -249,7 +294,7 @@ router.get('/recommendCom', authMiddleWare, async (req, res, next) => {
 			},
 		});
 
-		return res.status(201).json({ data: correctCom });
+		return res.status(200).json({ data: correctCom });
 	} catch (err) {
 		next(err);
 	}
@@ -288,7 +333,7 @@ router.get('/community', async (req, res, next) => {
 			//   manageId: true,
 		},
 	});
-	return res.status(201).json({ data: randomCommunity });
+	return res.status(200).json({ data: randomCommunity });
 });
 
 //모임 정보조회
@@ -318,7 +363,7 @@ router.get('/community/:communityId', async (req, res, next) => {
 			},
 		});
 
-		return res.status(201).json({ data: community });
+		return res.status(200).json({ data: community });
 	} catch (err) {
 		next(err);
 	}

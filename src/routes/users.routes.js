@@ -16,22 +16,23 @@ dotenv.config();
 router.post('/email', async (req, res, next) => {
 	const { email } = req.body;
 	const user = await prisma.users.findUnique({ where: { email } });
-	const verifyToken = createVerifyToken(user.email);
-	res.cookie('verification', `Bearer ${verifyToken}`);
-	// const hashedemail = await bcrypt.hash(email, 10);
-	// const hashedverifyToken = await bcrypt.hash(verifyToken, 10);
-	// await emailSender(email, hashedverifyToken);
-	await emailSender(email, verifyToken);
-	try {
-		res.json({
-			ok: true,
-			msg: '이메일이 성공적으로 전송되었습니다.',
-			// token: hashedverifyToken
-			token: verifyToken,
-		});
-	} catch (error) {
-		console.error('이메일 전송에 실패했습니다:', error);
-		res.status(500).json({ ok: false, msg: '이메일 전송에 실패했습니다.' });
+
+	if (!user.isVerified) {
+		const verifyToken = createVerifyToken(user.email);
+		res.cookie('verification', `Bearer ${verifyToken}`);
+		await emailSender(email, verifyToken);
+		try {
+			res.json({
+				ok: true,
+				msg: '이메일이 성공적으로 전송되었습니다.',
+				token: verifyToken,
+			});
+		} catch (error) {
+			console.error('이메일 전송에 실패했습니다:', error);
+			res.status(500).json({ ok: false, msg: '이메일 전송에 실패했습니다.' });
+		}
+	} else {
+		res.status(400).json({ ok: false, msg: '이미 인증 완료된 이메일입니다.' });
 	}
 });
 
@@ -174,9 +175,9 @@ router.get('/users', authMiddleWare, async (req, res, next) => {
 /**
  * 타인 프로필 조회
  */
-router.get('/users/:userId', async (req, res, next) => {
-	//const { userId } = req.user;
+router.get('/users/:userId', authMiddleWare, async (req, res, next) => {
 	const { userId } = req.params;
+	const { loginId } = req.user.id;
 
 	const user = await prisma.users.findFirst({
 		where: { id: +userId },
@@ -187,11 +188,21 @@ router.get('/users/:userId', async (req, res, next) => {
 		},
 	});
 
+	const isFollowing = await prisma.follow.findFirst({
+		where: {
+			followerId: loginId,
+			followingId: +userId,
+		},
+	});
+
 	if (!user) {
 		return res.status(404).json({ message: '존재하지 않는 유저입니다.' });
 	}
-
-	return res.status(200).json({ data: user });
+	return res.status(200).json({
+		data: user,
+		loginMatch: +req.user.id === +userId ? true : false,
+		isFollowing: isFollowing !== null,
+	});
 });
 
 /**
@@ -244,12 +255,10 @@ router.patch(
 				user: updatedUser,
 			});
 		} catch (error) {
-			return res
-				.status(500)
-				.json({
-					message: '서버 오류가 발생했습니다.' + error.message,
-					error: error.message,
-				});
+			return res.status(500).json({
+				message: '서버 오류가 발생했습니다.' + error.message,
+				error: error.message,
+			});
 		}
 	},
 );
