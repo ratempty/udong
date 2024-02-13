@@ -145,13 +145,13 @@ export function setupUserInfoForm() {
 				.then((data) => {
 					alert('사용자 정보가 성공적으로 업데이트되었습니다.');
 					closeModal();
+					fetchUserInfo();
 				})
 				.catch((error) => {
 					console.error('정보 수정 중 에러 발생:', error);
 				});
 		});
 }
-
 export function setupLoginListener() {
 	document
 		.getElementById('submit-login')
@@ -205,9 +205,14 @@ function populateUserInfo(userInfo) {
 	document.getElementById('user-name').value = userInfo.name;
 	document.getElementById('user-interest').value = userInfo.interest || '';
 	const profileImagePath = userInfo.profileImage;
-	const fullPath = `/uploads/profileImages/${profileImagePath}`;
-	document.getElementById('profile-image-display').src =
-		fullPath || '기본 이미지 경로';
+	const profileImageDisplay = document.getElementById('profile-image-display');
+	if(profileImagePath){
+		const fullPath = `/uploads/profileImages/${profileImagePath}`;
+		profileImageDisplay.src =
+			fullPath || '기본 이미지 경로';
+	} else {
+		profileImageDisplay.parentNode.removeChild(profileImageDisplay)
+	}
 	document.getElementById('modal-user-info').style.display = 'block';
 }
 /**
