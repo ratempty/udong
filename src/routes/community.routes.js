@@ -2,6 +2,9 @@ import express from 'express';
 import { prisma } from '../utils/index.js';
 import jwt from 'jsonwebtoken';
 import authMiddleWare from '../middleware/auth.middleware.js';
+import multer from 'multer';
+import { fileURLToPath } from 'url';
+import path, { dirname } from 'path';
 
 const router = express.Router();
 
@@ -289,6 +292,7 @@ router.get('/community', async (req, res, next) => {
 });
 
 //모임 정보조회
+
 router.get('/community/:communityId', async (req, res, next) => {
 	try {
 		const { communityId } = req.params;

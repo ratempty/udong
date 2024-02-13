@@ -248,6 +248,7 @@ function loginSuccess() {
 	closeModal();
 	chkLogin();
 	updateUIAfterLogin();
+	window.location.reload();
 }
 
 // 모달 창 닫기 함수
