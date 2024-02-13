@@ -10,8 +10,16 @@ router.get('/auth', async (req, res) => {
 	try {
 		const decodedToken = jwt.verify(token, process.env.CUSTOM_SECRET_KEY);
 		if (decodedToken.email === email) {
-
-			res.send('Email 인증 처리 완료.');
+			const updatedUser = await prisma.users.update({
+				where: { email: email },
+				data: {
+					isVerified: true
+				},
+			});
+			return res.status(200).json({
+				message: 'Email 인증 처리 완료.',
+				user: updatedUser,
+			});
 		} else {
 			res.status(400).send('부적절한 email 또는 token.');
 		}
