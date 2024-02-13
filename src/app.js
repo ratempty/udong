@@ -7,6 +7,7 @@ import userRouter from './routes/users.routes.js';
 import postRouter from './routes/posts.routes.js';
 import kakaoLogin from './routes/kakao.js';
 import emailRouter from './routes/email.routes.js';
+import followRouter from './routes/follow.routes.js';
 
 const app = express();
 const PORT = 3000;
@@ -22,6 +23,7 @@ app.use('/api', [
 	postRouter,
 	postlike,
 	emailRouter,
+	followRouter,
 ]);
 
 app.listen(PORT, () => {

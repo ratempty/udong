@@ -202,3 +202,8 @@ footer {
 	text-decoration: none;
 	cursor: pointer;
 }
+
+/* 프로필 이미지 */
+#profile-image-display {
+	max-width: 100%;
+}

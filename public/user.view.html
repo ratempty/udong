@@ -8,5 +8,29 @@
 		<link rel="stylesheet" href="./style/basic.css" />
 		<title>우리동네 동아리</title>
 	</head>
-	<body></body>
+	<body>
+        <header>
+            <div class="header-left">로고</div>
+            <div class="header-right">
+                <button id="btn-logout">로그아웃</button>
+                <button id="btn-user-info" data-modal-target="#modal-user-info">
+                    내 정보
+                </button>
+            </div>
+        </header>
+        <main class="user-info-view">
+            <section class="user-profile">
+                <img id="profile-image-display" src="path_to_user_image.jpg" alt="프로필 이미지" class="profile-image"/>
+                <h2 id="user-name-display">사용자 이름</h2>
+                <p id="user-interest-display">관심사: 사용자 관심사</p>
+                <div class="user-actions">
+                    <button id="btn-follow" class="action-button">팔로우</button>
+                    <button id="btn-unfollow" class="action-button hidden">언팔로우</button>
+                </div>
+            </section>
+        </main>
+        <footer>
+            <p>Copyrightⓒ2024 Team udong All rights reserved.</p>
+        </footer>
+    </body>
 </html>
