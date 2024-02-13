@@ -7,6 +7,7 @@ import {
 	verifyEmail,
 } from './auth.js';
 import { setupModalListeners } from './modal.js';
+import { fetchData, displayData } from './index.js';
 
 document.addEventListener('DOMContentLoaded', function () {
 	setupModalListeners();
@@ -16,3 +17,8 @@ document.addEventListener('DOMContentLoaded', function () {
 	chkLogin();
 	verifyEmail();
 });
+
+window.onload = function () {
+	fetchData();
+	displayData();
+};
