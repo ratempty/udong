@@ -65,9 +65,9 @@ router.delete('/unfollow/:followingId', authMiddleWare, async (req, res) => {
 				id: +existingFollow.id,
 			},
 		});
-		res.status(200).json({ message: '언팔로우 성공', unfollow });
+		res.status(204).json({ message: '언팔로우 성공' });
 	} catch (error) {
-		res.status(400).json({ message: '언팔로우 실패', error: error.message });
+		res.status(404).json({ message: '언팔로우 실패', error: error.message });
 	}
 });
 
