@@ -8,6 +8,7 @@ import {
 } from './auth.js';
 import { bringCommunity } from './community.js';
 import { setupModalListeners } from './modal.js';
+import { fetchData, displayData } from './index.js';
 
 document.addEventListener('DOMContentLoaded', function () {
 	setupModalListeners();
@@ -18,3 +19,8 @@ document.addEventListener('DOMContentLoaded', function () {
 	bringCommunity();
 	verifyEmail();
 });
+
+window.onload = function () {
+	fetchData();
+	displayData();
+};
