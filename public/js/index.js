@@ -17,18 +17,20 @@ export function displayData(posts) {
 	const postContainer = document.getElementById('content-ground');
 
 	// 받아온 데이터를 반복해서 처리
-	posts.forEach((post) => {
-		const postElement = document.createElement('div');
-		postElement.innerHTML = `
-       
-            <h2>${post.title}</h2>
-            <p>${post.content}</p>
-            <p>좋아요 수: ${post.parentsId}</p>
-            <p>작성일자: ${post.createdAt}</p>
-            <hr>
-        `;
-
-		postContainer.appendChild(postElement);
-		console.log(postElement);
-	});
+	if(postContainer){
+		posts.forEach((post) => {
+			const postElement = document.createElement('div');
+			postElement.innerHTML = `
+		   
+				<h2>${post.title}</h2>
+				<p>${post.content}</p>
+				<p>좋아요 수: ${post.parentsId}</p>
+				<p>작성일자: ${post.createdAt}</p>
+				<hr>
+			`;
+	
+			postContainer.appendChild(postElement);
+			console.log(postElement);
+		});
+	}
 }
