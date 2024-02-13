@@ -122,34 +122,30 @@ export function verifyEmail() {
 		const emailInput = document.getElementById('user-email');
 		const email = emailInput.value;
 
-		// Check if email is not empty
-		if (email.trim() !== '') {
-			fetch('/api/email', {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json'
-				},
-				body: JSON.stringify({
-					email: email
-				})
+		fetch('/api/email', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify({
+				email: email
 			})
-				.then((response) => {
-					if (response.ok) {
-						return response.json();
-					}
-					throw new Error('네트워크 에러 발생');
-				})
-				.then((data) => {
-					alert('이메일 발송 완료.');
-					closeModal();
-					fetchUserInfo();
-				})
-				.catch((error) => {
-					console.error('이메일 발송 오류:', error);
-				});
-		} else {
-			console.error('email이 비어있습니다.');
-		}
+		})
+			.then((response) => {
+				if (!response.ok) {
+					alert('이미 인증이 완료된 계정입니다.');
+				}
+				throw new Error('이미 인증이 완료된 계정입니다');
+			})
+			.then((data) => {
+				alert('이메일 발송 완료.');
+				closeModal();
+				fetchUserInfo();
+			})
+			.catch((error) => {
+				console.error('이메일 발송 오류:', error);
+			});
+
 	});
 }
 
