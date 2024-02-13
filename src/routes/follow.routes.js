@@ -13,7 +13,6 @@ router.post('/follow/:followingId', authMiddleWare, async (req, res) => {
 	const { followingId } = req.params;
 	const followerId = req.user.id;
 
-
 	if (followerId == followingId) {
 		return res.status(400).json({ message: '본인은 팔로우할 수 없습니다.' });
 	}
@@ -25,12 +24,6 @@ router.post('/follow/:followingId', authMiddleWare, async (req, res) => {
 				followingId: +followingId,
 			},
 		});
-
-		res.status(201).json(follow);
-	} catch (error) {
-		res.status(400).json({ message: '팔로우 실패', error: error.message });
-	}
-});
 
 		if (existingFollow) {
 			return res.status(409).json({ message: '이미 팔로우한 유저입니다.' });
@@ -48,7 +41,6 @@ router.post('/follow/:followingId', authMiddleWare, async (req, res) => {
 	}
 });
 
-
 /**
  * 언팔로우
  */
@@ -56,10 +48,7 @@ router.delete('/unfollow/:followingId', authMiddleWare, async (req, res) => {
 	const { followingId } = req.params;
 	const followerId = req.user.id;
 	try {
-	const unfollow = await prisma.follow.delete({
-
 		const existingFollow = await prisma.follow.findFirst({
-
 			where: {
 				followerId: +followerId,
 				followingId: +followingId,
@@ -76,7 +65,7 @@ router.delete('/unfollow/:followingId', authMiddleWare, async (req, res) => {
 				id: +existingFollow.id,
 			},
 		});
-		res.status(204).json({ message: '언팔로우 성공', unfollow });
+		res.status(204).json({ message: '언팔로우 성공' });
 	} catch (error) {
 		res.status(404).json({ message: '언팔로우 실패', error: error.message });
 	}
