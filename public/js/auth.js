@@ -123,12 +123,9 @@ export function verifyEmail() {
 					if (!response.ok) {
 						alert('이미 인증이 완료된 계정입니다.');
 					}
-					throw new Error('이미 인증이 완료된 계정입니다');
-				})
-				.then((data) => {
-					alert('이메일 발송 완료.');
-					closeModal();
-					fetchUserInfo();
+					else {
+						alert('이메일 발송 완료.');
+					}
 				})
 				.catch((error) => {
 					console.error('이메일 발송 오류:', error);
