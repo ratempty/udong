@@ -3,29 +3,34 @@ import { setupModalListeners } from './modal.js';
 // 추천모임 이미지 가져오기
 
 export async function bringCommunity() {
-	try {
-		const response = await fetch('/api/recommendCom', {
-			method: 'GET',
-			headers: {
-				'Content-Type': 'application/json',
-			},
-		});
-		const data = await response.json();
-		for (let i = 0; i < data.data.length; i++) {
-			const nav = document.querySelector('.nav-images');
-			const newDiv = document.createElement('div');
-			const newImg = document.createElement('img');
-			newImg.src = `./image/image${i}.png`;
-			newImg.alt = data.data[i].comName;
-
-			newDiv.appendChild(newImg);
-			nav.appendChild(newDiv);
-			newImg.addEventListener('click', () => {
-				window.location.href = 'community.html?id=' + data.data[i].id;
+	const currentUrl = window.location.href;
+	const urlParams = new URLSearchParams(new URL(currentUrl).search);
+	const id = urlParams.get('id');
+	if (!id) {
+		try {
+			const response = await fetch('/api/recommendCom', {
+				method: 'GET',
+				headers: {
+					'Content-Type': 'application/json',
+				},
 			});
+			const data = await response.json();
+			for (let i = 0; i < data.data.length; i++) {
+				const nav = document.querySelector('.nav-images');
+				const newDiv = document.createElement('div');
+				const newImg = document.createElement('img');
+				newImg.src = `./image/image${i}.png`;
+				newImg.alt = data.data[i].comName;
+
+				newDiv.appendChild(newImg);
+				nav.appendChild(newDiv);
+				newImg.addEventListener('click', () => {
+					window.location.href = 'community.html?id=' + data.data[i].id;
+				});
+			}
+		} catch (error) {
+			console.log('요청 중 오류 발생:', error);
 		}
-	} catch (error) {
-		console.log('요청 중 오류 발생:', error);
 	}
 }
 
@@ -76,9 +81,10 @@ async function getCommunityPosts() {
 			});
 
 			const data = await response.json();
-			const sortedData = data.data.sort(
-				(a, b) => new Date(a.createdAt) - new Date(b.createdAt),
-			);
+			const sortedData =
+				data?.data?.sort(
+					(a, b) => new Date(a.createdAt) - new Date(b.createdAt),
+				) ?? [];
 
 			const main = document.querySelector('.main');
 			for (let i = 0; i < sortedData.length; i++) {
@@ -100,11 +106,34 @@ async function getCommunityPosts() {
 
 getCommunityPosts();
 
-document.addEventListener('DOMContentLoaded', function () {
-	const postBtn = document.querySelector('#btn-post');
-	if(postBtn){
-		postBtn.addEventListener('click', () => {
-			setupModalListeners();
-		});
+// 모임 글작성
+
+async function makePost() {
+	try {
+		const currentUrl = window.location.href;
+		const urlParams = new URLSearchParams(new URL(currentUrl).search);
+		const id = urlParams.get('id');
+
+		document
+			.querySelector('#postForm')
+			.addEventListener('submit', async function (e) {
+				e.preventDefault();
+				const formData = new FormData(this);
+				for (const x of formData) {
+					console.log(x);
+				}
+				try {
+					const response = await fetch(`/api/community/${id}`, {
+						method: 'POST',
+						body: formData,
+					});
+				} catch (error) {
+					console.log('서버 요청 중 오류:', error);
+				}
+			});
+	} catch (error) {
+		console.log('처리 중 오류:', error);
 	}
-});
+}
+
+makePost();

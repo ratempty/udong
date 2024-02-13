@@ -13,7 +13,6 @@ router.post(
 		const { communityId } = req.params;
 		const user = req.user;
 		const { title, content } = req.body;
-
 		//유저가 커뮤니티에 속해있으면 작성 아니면 모임가입필요
 		const isCommunityUser = await prisma.communityUsers.findFirst({
 			where: {
@@ -38,7 +37,7 @@ router.post(
 				.json({ message: '모임에 가입한 사람만 글을 작성할 수 있습니다.' });
 		}
 
-		return res.status(201).json({ message: '작성완료' });
+		return res.status(201).json({ message: '작성완료', post });
 	},
 );
 

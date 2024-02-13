@@ -128,9 +128,11 @@
 			<div class="modal-content">
 				<span class="close">&times;</span>
 				<form id="postForm">
-					<input type="text" />
-					<input type="text" />
-					<input type="text" />
+					<label for="postTitle">글 제목 :</label>
+					<input type="text" id="postTitle" name="title" />
+					<label for="postContent">글 내용 :</label>
+					<input type="textArea" id="postContent" name="content" />
+					<button type="submit" id="submitPost">작성하기</button>
 				</form>
 			</div>
 		</div>
