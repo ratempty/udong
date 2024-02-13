@@ -53,6 +53,7 @@ model Community {
   interest        String      @map("interest")
   managerId       Int         @map("managerId")
   communityImage  String?     @map("communityImage")
+  communityContent String      @map("communityContent")
 
   posts Posts[]
   communityUsers CommunityUsers[]

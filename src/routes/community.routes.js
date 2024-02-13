@@ -9,7 +9,7 @@ const router = express.Router();
  * 모임 개설
  */
 router.post('/community', authMiddleWare, async (req, res, next) => {
-	const { comName, interest } = req.body;
+	const { comName, interest, communityContent } = req.body;
 	const loginId = req.user.id;
 
 	if (!comName) {
@@ -30,6 +30,7 @@ router.post('/community', authMiddleWare, async (req, res, next) => {
 				comName,
 				interest,
 				managerId: loginId,
+				communityContent,
 			},
 		});
 
@@ -91,54 +92,6 @@ router.delete(
 		}
 	},
 );
-//모임 게시글 조회 => 해당모임을 선택하면 게시글 뿌려줌
-router.get('/community/:communityId', async (req, res, next) => {
-	try {
-		const { communityId } = req.params;
-
-		const findCommuinty = await prisma.community.findFirst({
-			where: { id: +communityId },
-		});
-		if (!findCommuinty) {
-			return res
-				.status(404)
-				.json({ message: '모임 정보가 존재하지 않습니다.' });
-		}
-
-		const findPosts = await prisma.posts.findFirst({
-			where: {
-				communityId: +communityId,
-			},
-		});
-		if (!findPosts) {
-			return res.status(404).json({ message: '표시할 게시글이 없습니다.' });
-		}
-
-		//이 밑으로 확인 필요
-		const posts = await prisma.posts.findMany({
-			where: {
-				communityId: +communityId,
-			},
-			select: {
-				id: true,
-				title: true,
-				content: true,
-				parentsId: true,
-				createdAt: true,
-				updatedAt: true,
-				user: {
-					select: {
-						name: true,
-					},
-				},
-			},
-		});
-
-		return res.status(201).json({ data: posts });
-	} catch (err) {
-		next(err);
-	}
-});
 
 //모임가입
 router.post(
@@ -180,7 +133,7 @@ router.post(
 );
 
 //모임 게시글 조회 => 해당모임을 선택하면 게시글 뿌려줌
-router.get('/community/:communityId', async (req, res, next) => {
+router.get('/community/post/:communityId', async (req, res, next) => {
 	try {
 		const { communityId } = req.params;
 
@@ -202,7 +155,6 @@ router.get('/community/:communityId', async (req, res, next) => {
 			return res.status(404).json({ message: '표시할 게시글이 없습니다.' });
 		}
 
-		//이 밑으로 확인 필요
 		const posts = await prisma.posts.findMany({
 			where: {
 				communityId: +communityId,
@@ -334,6 +286,38 @@ router.get('/community', async (req, res, next) => {
 		},
 	});
 	return res.status(201).json({ data: randomCommunity });
+});
+
+//모임 정보조회
+router.get('/community/:communityId', async (req, res, next) => {
+	try {
+		const { communityId } = req.params;
+
+		const findCommuinty = await prisma.community.findFirst({
+			where: { id: +communityId },
+		});
+		if (!findCommuinty) {
+			return res
+				.status(404)
+				.json({ message: '모임 정보가 존재하지 않습니다.' });
+		}
+
+		const community = await prisma.community.findMany({
+			where: {
+				id: +communityId,
+			},
+			select: {
+				communityImage: true,
+				comName: true,
+				interest: true,
+				communityContent: true,
+			},
+		});
+
+		return res.status(201).json({ data: community });
+	} catch (err) {
+		next(err);
+	}
 });
 
 export default router;
