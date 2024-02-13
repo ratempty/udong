@@ -94,12 +94,10 @@ router.get('/followers/:userId', authMiddleWare, async (req, res) => {
 		});
 		res.status(200).json(followers.map((follow) => follow.follower));
 	} catch (error) {
-		res
-			.status(500)
-			.json({
-				message: '팔로워 목록 조회 중 오류가 발생했습니다.',
-				error: error.message,
-			});
+		res.status(500).json({
+			message: '팔로워 목록 조회 중 오류가 발생했습니다.',
+			error: error.message,
+		});
 	}
 });
 
@@ -127,12 +125,10 @@ router.get('/following/:userId', authMiddleWare, async (req, res) => {
 		});
 		res.status(200).json(followings.map((follow) => follow.following));
 	} catch (error) {
-		res
-			.status(500)
-			.json({
-				message: '팔로잉 목록 조회 중 오류가 발생했습니다.',
-				error: error.message,
-			});
+		res.status(500).json({
+			message: '팔로잉 목록 조회 중 오류가 발생했습니다.',
+			error: error.message,
+		});
 	}
 });
 

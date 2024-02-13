@@ -13,7 +13,7 @@ router.get('/auth', async (req, res) => {
 			const updatedVerify = await prisma.users.update({
 				where: { email: email },
 				data: {
-					isVerified: true
+					isVerified: true,
 				},
 			});
 			return res.status(200).json({

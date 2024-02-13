@@ -176,7 +176,6 @@ router.get('/users', authMiddleWare, async (req, res, next) => {
  * 타인 프로필 조회
  */
 router.get('/users/:userId', authMiddleWare, async (req, res, next) => {
-	
 	const { userId } = req.params;
 	const { loginId } = req.user.id;
 
@@ -256,12 +255,10 @@ router.patch(
 				user: updatedUser,
 			});
 		} catch (error) {
-			return res
-				.status(500)
-				.json({
-					message: '서버 오류가 발생했습니다.' + error.message,
-					error: error.message,
-				});
+			return res.status(500).json({
+				message: '서버 오류가 발생했습니다.' + error.message,
+				error: error.message,
+			});
 		}
 	},
 );
