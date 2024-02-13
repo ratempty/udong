@@ -17,7 +17,7 @@ export function displayData(posts) {
 	const postContainer = document.getElementById('content-ground');
 
 	// 받아온 데이터를 반복해서 처리
-	if(postContainer){
+	if(postContainer && posts){
 		posts.forEach((post) => {
 			const postElement = document.createElement('div');
 			postElement.innerHTML = `
