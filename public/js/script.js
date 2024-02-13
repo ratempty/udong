@@ -18,9 +18,6 @@ document.addEventListener('DOMContentLoaded', function () {
 	chkLogin();
 	bringCommunity();
 	verifyEmail();
-});
-
-window.onload = function () {
 	fetchData();
 	displayData();
-};
+});
