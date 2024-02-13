@@ -117,7 +117,7 @@ router.post(
 		});
 		if (User) {
 			return res
-				.status(404)
+				.status(409)
 				.json({ message: '이미 모임에 가입된 사용자 입니다.' });
 		}
 
@@ -174,7 +174,7 @@ router.get('/community/post/:communityId', async (req, res, next) => {
 			},
 		});
 
-		return res.status(201).json({ data: posts });
+		return res.status(200).json({ data: posts });
 	} catch (err) {
 		next(err);
 	}
@@ -216,10 +216,10 @@ router.get('/postlike', async (req, res, next) => {
 					createdAt: 'desc',
 				},
 			});
-			return res.status(201).json({ data: post });
+			return res.status(200).json({ data: post });
 		}
 
-		return res.status(201).json({ data: postlike });
+		return res.status(200).json({ data: postlike });
 	} catch (err) {
 		next(err);
 	}
@@ -291,7 +291,7 @@ router.get('/recommendCom', authMiddleWare, async (req, res, next) => {
 			},
 		});
 
-		return res.status(201).json({ data: correctCom });
+		return res.status(200).json({ data: correctCom });
 	} catch (err) {
 		next(err);
 	}
@@ -330,7 +330,7 @@ router.get('/community', async (req, res, next) => {
 			//   manageId: true,
 		},
 	});
-	return res.status(201).json({ data: randomCommunity });
+	return res.status(200).json({ data: randomCommunity });
 });
 
 //모임 정보조회
@@ -359,7 +359,7 @@ router.get('/community/:communityId', async (req, res, next) => {
 			},
 		});
 
-		return res.status(201).json({ data: community });
+		return res.status(200).json({ data: community });
 	} catch (err) {
 		next(err);
 	}
