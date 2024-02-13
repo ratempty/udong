@@ -4,6 +4,7 @@ import {
 	setupSignupForm,
 	setupLogoutListener,
 	chkLogin,
+	verifyEmail,
 } from './auth.js';
 import { setupModalListeners } from './modal.js';
 
@@ -13,4 +14,5 @@ document.addEventListener('DOMContentLoaded', function () {
 	setupLogoutListener();
 	setupSignupForm();
 	chkLogin();
+	verifyEmail();
 });
