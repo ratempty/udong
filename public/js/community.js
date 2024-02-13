@@ -102,7 +102,9 @@ getCommunityPosts();
 
 document.addEventListener('DOMContentLoaded', function () {
 	const postBtn = document.querySelector('#btn-post');
-	postBtn.addEventListener('click', () => {
-		setupModalListeners();
-	});
+	if(postBtn){
+		postBtn.addEventListener('click', () => {
+			setupModalListeners();
+		});
+	}
 });
