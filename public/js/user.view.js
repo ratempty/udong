@@ -1,4 +1,4 @@
-import { followUser, unfollowUser } from './follow.js';
+import { followUser, unfollowUser, loadFollowers, loadFollowings } from './follow.js';
 
 document.addEventListener('DOMContentLoaded', function () {
 	const queryParams = new URLSearchParams(window.location.search);
@@ -7,6 +7,7 @@ document.addEventListener('DOMContentLoaded', function () {
 	if (userId) {
 		userInfoSearch(userId);
 		setupFollowUnfollowButtons();
+		setupToggleListeners();
 	} else {
 		console.error('유저 아이디가 URL에 없습니다.');
 		location.href = '../';
@@ -81,3 +82,25 @@ function setupFollowUnfollowButtons() {
 	btnFollow.addEventListener('click', () => followUser(userId));
 	btnUnfollow.addEventListener('click', () => unfollowUser(userId));
 }
+function setupToggleListeners() {
+	const urlParams = new URLSearchParams(window.location.search);
+	const userId = urlParams.get('userId');
+
+
+    document.getElementById('toggle-followers-list').addEventListener('click', function() {
+		const followersList = document.getElementById('followers-list');
+		followersList.classList.toggle('hidden');
+		if (!followersList.classList.contains('hidden')) {
+			loadFollowers(userId); 
+		}
+	});
+	
+	document.getElementById('toggle-following-list').addEventListener('click', function() {
+		const followingList = document.getElementById('following-list');
+		followingList.classList.toggle('hidden');
+		if (!followingList.classList.contains('hidden')) {
+			loadFollowings(userId); 
+		}
+	});	
+}
+
