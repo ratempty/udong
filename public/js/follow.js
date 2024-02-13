@@ -28,10 +28,8 @@ export function unfollowUser(userId) {
 		method: 'DELETE',
 		headers: {
 			'Content-Type': 'application/json',
-			// 필요한 경우 인증 토큰을 추가
-			// 'Authorization': `Bearer ${yourAuthToken}`
 		},
-		credentials: 'include', // 쿠키를 포함시키려면 이 옵션을 사용
+		credentials: 'include', 
 	})
 		.then((response) => {
 			if (!response.ok) {
@@ -41,7 +39,6 @@ export function unfollowUser(userId) {
 		})
 		.then((data) => {
 			console.log('언팔로우 성공:', data);
-			// 언팔로우 성공 후 UI 변경
 			document.getElementById('btn-unfollow').classList.add('hidden');
 			document.getElementById('btn-follow').classList.remove('hidden');
 		})
@@ -65,6 +62,9 @@ export function loadFollowers(userId) {
         data.forEach(follower => {
             const listItem = document.createElement('li');
             listItem.textContent = `${follower.name} - ${follower.interest}`;
+            listItem.addEventListener('click', () => {
+                window.location.href = `/pages/user.view.html?userId=${follower.id}`; 
+            });
             followersList.appendChild(listItem);
         });
     })
@@ -86,6 +86,9 @@ export function loadFollowings(userId) {
         data.forEach(following => {
             const listItem = document.createElement('li');
             listItem.textContent = `${following.name} - ${following.interest}`;
+            listItem.addEventListener('click', () => {
+                window.location.href = `/pages/user.view.html?userId=${following.id}`;
+            });
             followingList.appendChild(listItem);
         });
     })

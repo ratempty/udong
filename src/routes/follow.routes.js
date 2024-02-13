@@ -85,6 +85,7 @@ router.get('/followers/:userId', authMiddleWare, async (req, res) => {
 			include: {
 				follower: {
 					select: {
+						id : true,
 						name: true,
 						interest: true,
 						email: true,
@@ -118,6 +119,7 @@ router.get('/following/:userId', authMiddleWare, async (req, res) => {
 			include: {
 				following: {
 					select: {
+						id : true,
 						name: true,
 						interest: true,
 						email: true,
