@@ -31,7 +31,12 @@ footer {
 * Header
 **************************/
 /* 헤더 버튼 스타일 */
-.header-right button {
+#logo {
+	width: 100px;
+	height: 100px;
+}
+.header-right button,
+.main button {
 	background-color: #007bff; /* 파란색 배경 */
 	color: white; /* 흰색 텍스트 */
 	border: none; /* 테두리 제거 */
@@ -43,7 +48,8 @@ footer {
 }
 
 /* 마우스 호버 시 버튼 스타일 */
-.header-right button:hover {
+.header-right button:hover,
+.main button:hover {
 	background-color: #0056b3; /* 어두운 파란색 배경 */
 }
 
@@ -208,6 +214,7 @@ footer {
 	max-width: 100%;
 }
 
+
 /****************************
 * 서브페이지
 ****************************/
@@ -258,4 +265,22 @@ footer {
 
 .hidden {
 	display: none;
+}
+
+.header {
+	margin-bottom: 50px;
+}
+.section {
+	width: 100vw;
+	height: 20vh;
+	display: flex;
+	flex-flow: row nowrap;
+	gap: 30px;
+	padding-left: 50px;
+	margin-bottom: 30px;
+}
+.main {
+	width: 100vw;
+	height: auto;
+	padding: 50px;
 }

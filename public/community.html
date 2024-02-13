@@ -7,13 +7,13 @@
 		<link rel="stylesheet" href="./style/style.css" />
 		<title>우리동네 동아리</title>
 	</head>
-
 	<body>
-		<header>
+		<header class="header">
 			<div class="header-left">
 				<img src="./image/udong.png" alt="" id="logo" />
 			</div>
 			<div class="header-right">
+				<p id="user-info"></p>
 				<button id="btn-login" data-modal-target="#modal-login">로그인</button>
 				<button id="btn-logout">로그아웃</button>
 				<button id="btn-signup" data-modal-target="#modal-signup">
@@ -24,20 +24,23 @@
 				</button>
 			</div>
 		</header>
-		<button class="create-community-button">모임 개설하기</button>
-		<nav class="community-nav">
-			<div class="nav-images">
-				<img src="image1.jpg" alt="소모임1" />
-				<img src="image2.jpg" alt="소모임2" />
+		<section class="section">
+			<div class="imgWrap">
+				<img src="#" alt="" class="comImage" />
 			</div>
-		</nav>
-		<div class="content">
-			<p>여기에 콘텐츠 내용이 들어갑니다.</p>
-		</div>
-
-		<footer>
-			<p>Copyrightⓒ2024 Team udong All rights reserved.</p>
-		</footer>
+			<div class="comExplane">
+				<p class="title">모임이름</p>
+				<p class="interesting">모임 관심사</p>
+				<p class="explane">모임 설명</p>
+			</div>
+		</section>
+		<main class="main">
+			<button id="btn-post" data-modal-target="#modal-post">글 작성</button>
+			<div class="wrapper">
+				<p class="postTitle">글 제목</p>
+				<p class="postContent">글 내용</p>
+			</div>
+		</main>
 		<!-- 모달 창 -->
 		<div id="modal-login" class="modal">
 			<div class="modal-content">
@@ -115,12 +118,19 @@
 						id="user-profile-image"
 						name="user-profile-image"
 					/>
-					<button type="button" id="verify-user">이메일 인증</button>
 					<button type="submit" id="submit-user-info">수정</button>
 				</form>
 			</div>
 		</div>
 
+		<div id="modal-post" class="modal">
+			<div class="modal-content">
+				<span class="close">&times;</span>
+				<form id="postForm"></form>
+			</div>
+		</div>
+
 		<script src="./js/script.js" type="module"></script>
+		<script src="./js/community.js" type="module"></script>
 	</body>
 </html>

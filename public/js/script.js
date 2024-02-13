@@ -6,6 +6,7 @@ import {
 	chkLogin,
 	verifyEmail,
 } from './auth.js';
+import { bringCommunity } from './community.js';
 import { setupModalListeners } from './modal.js';
 
 document.addEventListener('DOMContentLoaded', function () {
@@ -14,5 +15,6 @@ document.addEventListener('DOMContentLoaded', function () {
 	setupLogoutListener();
 	setupSignupForm();
 	chkLogin();
+	bringCommunity();
 	verifyEmail();
 });
