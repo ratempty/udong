@@ -102,20 +102,6 @@ export function setupSignupForm() {
 		});
 }
 
-export function fetchUserInfo() {
-	fetch('/api/users')
-		.then((response) => {
-			if (!response.ok) {
-				throw new Error('네트워크 응답이 올바르지 않습니다.');
-			}
-			return response.json();
-		})
-		.then((data) => {
-			console.log('사용자 정보:', data);
-		})
-		.catch((error) => console.error('사용자 정보 조회 중 오류 발생:', error));
-}
-
 export function verifyEmail() {
 	document
 		.getElementById('verify-user')
@@ -144,7 +130,6 @@ export function verifyEmail() {
 					.then((data) => {
 						alert('이메일 발송 완료.');
 						closeModal();
-						fetchUserInfo();
 					})
 					.catch((error) => {
 						console.error('이메일 발송 오류:', error);
@@ -184,7 +169,6 @@ export function setupUserInfoForm() {
 				.then((data) => {
 					alert('사용자 정보가 성공적으로 업데이트되었습니다.');
 					closeModal();
-					fetchUserInfo();
 				})
 				.catch((error) => {
 					console.error('정보 수정 중 에러 발생:', error);
@@ -231,7 +215,6 @@ export function myInfoListener() {
 					return response.json();
 				})
 				.then((data) => {
-					console.log('받은 유저 정보:', data.data);
 					populateUserInfo(data.data);
 				})
 				.catch((error) => {
