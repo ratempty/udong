@@ -1,12 +1,12 @@
-import { myInfoListener } from './auth.js';
+import { followUser, unfollowUser } from './follow.js';
 
 document.addEventListener('DOMContentLoaded', function () {
 	const queryParams = new URLSearchParams(window.location.search);
-
 	const userId = queryParams.get('userId');
 
 	if (userId) {
 		userInfoSearch(userId);
+		setupFollowUnfollowButtons();
 	} else {
 		console.error('유저 아이디가 URL에 없습니다.');
 		location.href = '../';
@@ -71,4 +71,13 @@ function populateUserInfo(userInfo, loginMatch, isFollowing, options = {}) {
 		btnFollow.style.display = 'none';
 		btnUnfollow.style.display = 'none';
 	}
+}
+
+function setupFollowUnfollowButtons() {
+	const btnFollow = document.getElementById('btn-follow');
+	const btnUnfollow = document.getElementById('btn-unfollow');
+	const userId = new URLSearchParams(window.location.search).get('userId');
+
+	btnFollow.addEventListener('click', () => followUser(userId));
+	btnUnfollow.addEventListener('click', () => unfollowUser(userId));
 }
