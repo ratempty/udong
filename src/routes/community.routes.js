@@ -77,9 +77,9 @@ router.delete(
 					.json({ message: '삭제하려는 모임이 존재하지 않습니다.' });
 			}
 
-			// if (loginId != existingCommunity.managerId) {
-			//   return res.status(403).json({ message: "모임장만 삭제 가능합니다." });
-			// }
+			if (loginId != existingCommunity.managerId) {
+			  return res.status(403).json({ message: "모임장만 삭제 가능합니다." });
+			}
 
 			await prisma.community.delete({
 				where: { id: +communityId },
@@ -116,6 +116,7 @@ router.post(
 		const User = await prisma.communityUsers.findFirst({
 			where: {
 				userId: +id,
+				communityId : +communityId,
 			},
 		});
 		if (User) {
