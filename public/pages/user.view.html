@@ -7,7 +7,9 @@
 	</head>
 	<body>
 		<header>
-			<div class="header-left">로고</div>
+			<div class="header-left">
+				<img src="./image/udong.png" alt="" id="logo" />
+			</div>
 			<div class="header-right">
 				<button id="btn-login" data-modal-target="#modal-login">로그인</button>
 				<button id="btn-logout">로그아웃</button>
@@ -123,6 +125,8 @@
 
 					<label for="user-name">이름:</label>
 					<input type="text" id="user-name" name="name" required />
+					<label for="user-password">비밀번호:</label>
+					<input type="password" id="user-password" name="pw" />
 
 					<label for="user-interest">관심사:</label>
 					<input type="text" id="user-interest" name="interest" />
