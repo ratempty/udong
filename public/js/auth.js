@@ -220,7 +220,6 @@ function populateUserInfo(userInfo, options = {}) {
 		nameSelector = 'user-name',
 		interestSelector = 'user-interest',
 		profileImageSelector = 'profile-image-display',
-		profileImagePathPrefix = '/uploads/profileImages/',
 		defaultProfileImage = '기본 이미지 경로',
 		modalSelector = 'modal-user-info',
 	} = options;
@@ -236,8 +235,7 @@ function populateUserInfo(userInfo, options = {}) {
 	const profileImageDisplay = document.getElementById(profileImageSelector);
 	if (profileImageDisplay) {
 		if (userInfo.profileImage) {
-			const fullPath = `${profileImagePathPrefix}${userInfo.profileImage}`;
-			profileImageDisplay.src = fullPath;
+			profileImageDisplay.src = userInfo.profileImage;
 		} else {
 			profileImageDisplay.src = defaultProfileImage;
 		}
@@ -309,43 +307,3 @@ function updateUIBeforeLogin() {
 	if (signupButton) signupButton.style.display = 'inline-block';
 	if (logoutButton) logoutButton.style.display = 'none';
 }
-
-// export function InfoListener() {
-// 	document
-// 		.getElementById('btn-user-info')
-// 		.addEventListener('click', function (event) {
-// 			event.preventDefault();
-
-// 			fetch('/api/users', {
-// 				method: 'GET',
-// 				credentials: 'include',
-// 			})
-// 				.then((response) => {
-// 					if (!response.ok) {
-// 						throw new Error('프로필 정보를 불러오는데 실패했습니다.');
-// 					}
-// 					return response.json();
-// 				})
-// 				.then((data) => {
-// 					console.log('받은 유저 정보:', data.data);
-// 					newUserInfo(data.data);
-// 				})
-// 				.catch((error) => {
-// 					console.error('에러 발생:', error); // 에러 처리
-// 				});
-// 		});
-// }
-// function newUserInfo(userInfo) {
-// 	document.getElementById('user-name-display').value = userInfo.name;
-// 	document.getElementById('user-interest-display').value =
-// 		userInfo.interest || '';
-// 	const profileImagePath = userInfo.profileImage;
-// 	const profileImageDisplay = document.getElementById('profile-image-display');
-// 	if (profileImagePath) {
-// 		const fullPath = `/uploads/profileImages/${profileImagePath}`;
-// 		profileImageDisplay.src = fullPath || '기본 이미지 경로';
-// 	} else {
-// 		profileImageDisplay.parentNode.removeChild(profileImageDisplay);
-// 	}
-// 	document.getElementById('modal-user-info').style.display = 'block';
-// }

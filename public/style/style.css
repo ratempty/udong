@@ -2,7 +2,9 @@ body {
 	font-family: Arial, sans-serif;
 }
 
-header, nav, footer {
+header,
+nav,
+footer {
 	padding: 20px;
 	text-align: center;
 }
@@ -17,7 +19,8 @@ header, nav, footer {
 	float: right;
 }
 
-.header-right button, .main button {
+.header-right button,
+.main button {
 	background-color: #007bff;
 	color: white;
 	border: none;
@@ -28,7 +31,8 @@ header, nav, footer {
 	transition: background-color 0.3s ease;
 }
 
-.header-right button:hover, .main button:hover {
+.header-right button:hover,
+.main button:hover {
 	background-color: #0056b3;
 }
 
@@ -46,7 +50,9 @@ header, nav, footer {
 	font-weight: bold;
 	border-radius: 8px;
 	cursor: pointer;
-	transition: background-color 0.3s, transform 0.2s;
+	transition:
+		background-color 0.3s,
+		transform 0.2s;
 	display: block;
 	margin: 20px 0;
 }
@@ -116,7 +122,8 @@ header, nav, footer {
 	gap: 15px;
 }
 
-.modal-content form input, .modal-content form button {
+.modal-content form input,
+.modal-content form button {
 	padding: 10px;
 	margin: 5px 0;
 	border-radius: 5px;
@@ -179,8 +186,8 @@ header, nav, footer {
 .user-actions {
 	margin-top: 20px;
 	display: flex;
-    flex-direction: column;
-    align-items: flex-start; 
+	flex-direction: column;
+	align-items: flex-start;
 }
 
 .action-button {
@@ -193,21 +200,23 @@ header, nav, footer {
 	margin: 5px;
 }
 
-#btn-follow, #btn-unfollow {
+#btn-follow,
+#btn-unfollow {
 	background-color: #4caf50;
 	color: white;
 	padding: 10px 15px;
 	border: none;
 	border-radius: 5px;
 	cursor: pointer;
-    margin: 10px auto;
+	margin: 10px auto;
 }
 
 #btn-unfollow {
 	background-color: #f44336;
 }
 
-.user-following-section, .user-followers-section {
+.user-following-section,
+.user-followers-section {
 	margin-top: 20px;
 }
 
@@ -219,7 +228,7 @@ header, nav, footer {
 	border-radius: 5px;
 	cursor: pointer;
 	display: block;
-    margin: 0 auto;
+	margin: 0 auto;
 	margin-bottom: 20px;
 }
 
@@ -231,7 +240,7 @@ header, nav, footer {
 	list-style: none;
 	padding: 0;
 	margin: 0;
-    width: 100%; 
+	width: 100%;
 }
 .follow-list li {
 	border-bottom: 1px solid #ccc;

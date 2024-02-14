@@ -1,12 +1,11 @@
 import express from 'express';
 import bcrypt from 'bcrypt';
-import multer from 'multer';
 import { prisma } from '../utils/index.js';
 import { createAccessToken, createVerifyToken } from '../utils/token.js';
 import authMiddleWare from '../middleware/auth.middleware.js';
-import { fileURLToPath } from 'url';
-import path, { dirname } from 'path';
-import fs from 'fs';
+import uploadMiddleWare, {
+	deleteExistingFile,
+} from '../middleware/upload.middleware.js';
 import dotenv from 'dotenv';
 import emailSender from '../utils/nodemailer.js';
 
@@ -36,30 +35,13 @@ router.post('/email', async (req, res, next) => {
 	}
 });
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-
-const storage = multer.diskStorage({
-	destination: (req, file, cb) => {
-		cb(null, path.join(__dirname, '../../public/uploads/profileImages'));
-	},
-	filename: (req, file, cb) => {
-		cb(
-			null,
-			`${file.fieldname}-${Date.now()}${path.extname(file.originalname)}`,
-		);
-	},
-});
-
-const upload = multer({ storage: storage });
-
 router.post(
 	'/sign-up',
-	upload.single('profileImage'),
+	uploadMiddleWare.single('profileImage'),
 	async (req, res, next) => {
 		try {
 			const { email, password, password_check, name, interest } = req.body;
-			const profileImage = req.file ? req.file.filename : null;
+			const profileImage = req.file ? req.file.location : null;
 
 			const isExistUser = await prisma.users.findFirst({
 				where: {
@@ -94,7 +76,8 @@ router.post(
 				.status(201)
 				.json({ message: `${name}님 회원가입을 축하합니다.` });
 		} catch (err) {
-			next(err);
+			console.error('업로드 중 에러 발생:', error.message);
+			res.status(500).send(error.message);
 		}
 	},
 );
@@ -116,10 +99,6 @@ router.post('/sign-in', async (req, res, next) => {
 				.json({ message: '유효하지 않은 이메일 또는 비밀번호' });
 
 		const accessToken = createAccessToken(user.id);
-
-		// export function createAccessToken(id) {
-		//   return jwt.sign({ id }, process.env.CUSTOM_SECRET_KEY, { expiresIn: "15m" });
-		// }
 
 		res.cookie('authorization', `Bearer ${accessToken}`);
 		return res.status(200).json({ message: '로그인 성공' });
@@ -211,11 +190,11 @@ router.get('/users/:userId', authMiddleWare, async (req, res, next) => {
 router.patch(
 	'/users',
 	authMiddleWare,
-	upload.single('profileImage'),
+	uploadMiddleWare.single('profileImage'),
 	async (req, res, next) => {
 		const loginId = req.user.id;
 		const { name, email, interest } = req.body;
-		const profileImage = req.file ? req.file.filename : null;
+		const profileImage = req.file ? req.file.location : null;
 
 		try {
 			const existUser = await prisma.users.findUnique({
@@ -226,18 +205,13 @@ router.patch(
 				return res.status(404).json({ message: '존재하지 않는 유저입니다.' });
 			}
 
-			if (profileImage && existUser.profileImage) {
-				fs.unlink(
-					path.join(
-						__dirname,
-						'../../public/uploads/profileImages',
-						existUser.profileImage,
-					),
-					(err) => {
-						if (err) console.log('기존 프로필 사진 삭제 불가:', err);
-						else console.log('기존 프로필 사진 성공적으로 삭제');
-					},
+			if (existUser && existUser.profileImage) {
+				let existingImage = existUser.profileImage.replace(
+					process.env.AWS_LOCATION,
+					'',
 				);
+				console.log(existingImage);
+				await deleteExistingFile('udongimages', existingImage);
 			}
 
 			const updatedUser = await prisma.users.update({
