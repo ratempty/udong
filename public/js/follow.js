@@ -29,7 +29,7 @@ export function unfollowUser(userId) {
 		headers: {
 			'Content-Type': 'application/json',
 		},
-		credentials: 'include', 
+		credentials: 'include',
 	})
 		.then((response) => {
 			if (!response.ok) {
@@ -48,49 +48,49 @@ export function unfollowUser(userId) {
 }
 
 /**
- * @param {*} userId 
+ * @param {*} userId
  */
 export function loadFollowers(userId) {
-    fetch(`/api/followers/${userId}`, {
-        method: 'GET',
-        credentials: 'include',
-    })
-    .then(response => response.json())
-    .then(data => {
-        const followersList = document.getElementById('followers-list');
-        followersList.innerHTML = ''; 
-        data.forEach(follower => {
-            const listItem = document.createElement('li');
-            listItem.textContent = `${follower.name} - ${follower.interest}`;
-            listItem.addEventListener('click', () => {
-                window.location.href = `/pages/user.view.html?userId=${follower.id}`; 
-            });
-            followersList.appendChild(listItem);
-        });
-    })
-    .catch(error => console.error('팔로워 목록 조회 실패:', error));
+	fetch(`/api/followers/${userId}`, {
+		method: 'GET',
+		credentials: 'include',
+	})
+		.then((response) => response.json())
+		.then((data) => {
+			const followersList = document.getElementById('followers-list');
+			followersList.innerHTML = '';
+			data.forEach((follower) => {
+				const listItem = document.createElement('li');
+				listItem.textContent = `${follower.name} - ${follower.interest}`;
+				listItem.addEventListener('click', () => {
+					window.location.href = `/pages/user.view.html?userId=${follower.id}`;
+				});
+				followersList.appendChild(listItem);
+			});
+		})
+		.catch((error) => console.error('팔로워 목록 조회 실패:', error));
 }
 
 /**
- * @param {*} userId 
+ * @param {*} userId
  */
 export function loadFollowings(userId) {
-    fetch(`/api/following/${userId}`, {
-        method: 'GET',
-        credentials: 'include',
-    })
-    .then(response => response.json())
-    .then(data => {
-        const followingList = document.getElementById('following-list');
-        followingList.innerHTML = ''; 
-        data.forEach(following => {
-            const listItem = document.createElement('li');
-            listItem.textContent = `${following.name} - ${following.interest}`;
-            listItem.addEventListener('click', () => {
-                window.location.href = `/pages/user.view.html?userId=${following.id}`;
-            });
-            followingList.appendChild(listItem);
-        });
-    })
-    .catch(error => console.error('팔로잉 목록 조회 실패:', error));
+	fetch(`/api/following/${userId}`, {
+		method: 'GET',
+		credentials: 'include',
+	})
+		.then((response) => response.json())
+		.then((data) => {
+			const followingList = document.getElementById('following-list');
+			followingList.innerHTML = '';
+			data.forEach((following) => {
+				const listItem = document.createElement('li');
+				listItem.textContent = `${following.name} - ${following.interest}`;
+				listItem.addEventListener('click', () => {
+					window.location.href = `/pages/user.view.html?userId=${following.id}`;
+				});
+				followingList.appendChild(listItem);
+			});
+		})
+		.catch((error) => console.error('팔로잉 목록 조회 실패:', error));
 }

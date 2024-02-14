@@ -1,49 +1,55 @@
 import express from 'express';
 import { prisma } from '../utils/index.js';
-import jwt from 'jsonwebtoken';
 import authMiddleWare from '../middleware/auth.middleware.js';
-import multer from 'multer';
-import { fileURLToPath } from 'url';
-import path, { dirname } from 'path';
+import uploadMiddleWare, {
+	deleteExistingFile,
+} from '../middleware/upload.middleware.js';
 
 const router = express.Router();
 
 /**
  * 모임 개설
  */
-router.post('/community', authMiddleWare, async (req, res, next) => {
-	const { comName, interest, communityContent } = req.body;
-	const loginId = req.user.id;
+router.post(
+	'/community',
+	authMiddleWare,
+	uploadMiddleWare.single('profileImage'),
+	async (req, res, next) => {
+		const { comName, interest, communityContent } = req.body;
+		const loginId = req.user.id;
+		const communityImage = req.file ? req.file.location : null;
 
-	if (!comName) {
-		return res.status(400).json({ message: '모임 이름을 입력하세요.' });
-	}
+		if (!comName) {
+			return res.status(400).json({ message: '모임 이름을 입력하세요.' });
+		}
 
-	if (!interest) {
-		return res.status(400).json({ message: '관심사를 선택하세요.' });
-	}
+		if (!interest) {
+			return res.status(400).json({ message: '관심사를 선택하세요.' });
+		}
 
-	if (!loginId) {
-		return res.status(401).json({ message: '로그인하세요.' });
-	}
+		if (!loginId) {
+			return res.status(401).json({ message: '로그인하세요.' });
+		}
 
-	try {
-		const community = await prisma.community.create({
-			data: {
-				comName,
-				interest,
-				managerId: loginId,
-				communityContent,
-			},
-		});
+		try {
+			const community = await prisma.community.create({
+				data: {
+					comName,
+					interest,
+					managerId: loginId,
+					communityContent,
+					communityImage: communityImage,
+				},
+			});
 
-		return res.status(201).json({ message: '모임이 정상 등록되었습니다.' });
-	} catch (error) {
-		return res
-			.status(500)
-			.json({ message: '서버 오류가 발생했습니다.', error: error.message });
-	}
-});
+			return res.status(201).json({ message: '모임이 정상 등록되었습니다.' });
+		} catch (error) {
+			return res
+				.status(500)
+				.json({ message: '서버 오류가 발생했습니다.', error: error.message });
+		}
+	},
+);
 
 /**
  * 모임 삭제
