@@ -210,7 +210,6 @@ router.patch(
 					process.env.AWS_LOCATION,
 					'',
 				);
-				console.log(existingImage);
 				await deleteExistingFile('udongimages', existingImage);
 			}
 
