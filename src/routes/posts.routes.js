@@ -21,31 +21,29 @@ router.post(
 			},
 		});
 
-		if (isCommunityUser) {
-			const post = await prisma.posts.create({
-				data: {
-					userId: +user.id,
-					communityId: +communityId,
-					title: title,
-					content: content,
-					parentsId: 0,
-				},
-			});
-		} else {
+		if (!isCommunityUser) {
 			return res
 				.status(403)
 				.json({ message: '모임에 가입한 사람만 글을 작성할 수 있습니다.' });
 		}
 
+		const post = await prisma.posts.create({
+			data: {
+				userId: +user.id,
+				communityId: +communityId,
+				title: title,
+				content: content,
+				parentsId: 0,
+			},
+		});
 		return res.status(201).json({ message: '작성완료', post });
 	},
 );
 
 // 게시글 수정
-// localhost:3000/api/:communityId/:postId
 router.patch('/community/:postId', authMiddleware, async (req, res, next) => {
 	const { postId } = req.params;
-	const { userId } = req.user;
+	const userId = req.user;
 	const { title, content } = req.body;
 
 	// 자기 글인지 확인
@@ -61,15 +59,15 @@ router.patch('/community/:postId', authMiddleware, async (req, res, next) => {
 	if (!isMyPost) {
 		return res.status(404).json({ message: '해당 글을 찾을 수 없습니다.' });
 	}
-
-	if (isMyPost.userId !== userId) {
+	console.log(userId.id, isMyPost.userId);
+	if (isMyPost.userId !== userId.id) {
 		return res.status(403).json({ message: '본인의 글만 수정할 수 있습니다.' });
 	}
 
 	const updatePost = await prisma.posts.update({
 		where: {
 			id: +postId,
-			userId: +userId,
+			userId: +userId.id,
 		},
 		data: {
 			title: title,
@@ -81,36 +79,42 @@ router.patch('/community/:postId', authMiddleware, async (req, res, next) => {
 
 // 게시글 삭제
 //localhost:3000/api/:communityId/:postId
-router.delete('/community/:postId', authMiddleware, async (req, res, next) => {
-	const { postId } = req.params;
-	const { userId } = req.user;
+router.delete(
+	'/community/post/:postId',
+	authMiddleware,
+	async (req, res, next) => {
+		const { postId } = req.params;
+		const user = req.user;
 
-	// 자기 글인지 확인
-	const isMyPost = await prisma.posts.findFirst({
-		where: {
-			id: +postId,
-		},
-		select: {
-			userId: true,
-		},
-	});
+		// 자기 글인지 확인
+		const isMyPost = await prisma.posts.findFirst({
+			where: {
+				id: +postId,
+			},
+			select: {
+				userId: true,
+			},
+		});
 
-	if (!isMyPost) {
-		return res.status(404).json({ message: '해당 글을 찾을 수 없습니다.' });
-	}
+		if (!isMyPost) {
+			return res.status(404).json({ message: '해당 글을 찾을 수 없습니다.' });
+		}
 
-	if (isMyPost.userId !== userId) {
-		return res.status(403).json({ message: '본인의 글만 삭제할 수 있습니다.' });
-	}
+		if (isMyPost.userId !== user.id) {
+			return res
+				.status(403)
+				.json({ message: '본인의 글만 삭제할 수 있습니다.' });
+		}
 
-	await prisma.posts.delete({
-		where: {
-			id: +postId,
-			userId: +userId,
-		},
-	});
-	return res.status(204).json({ message: '삭제완료' });
-});
+		await prisma.posts.delete({
+			where: {
+				id: +postId,
+				userId: +user.id,
+			},
+		});
+		return res.status(201).json({ message: '삭제완료' });
+	},
+);
 
 /**
  * 댓글 등록
@@ -222,7 +226,7 @@ router.patch('/comment/:postId', authMiddleware, async (req, res, next) => {
 
 		return res.status(200).json({
 			message: '댓글이 정상 수정되었습니다.',
-			resume: updatedComment,
+			data: updatedComment,
 		});
 	} catch (error) {
 		return res

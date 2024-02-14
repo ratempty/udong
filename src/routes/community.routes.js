@@ -78,7 +78,7 @@ router.delete(
 			}
 
 			if (loginId != existingCommunity.managerId) {
-			  return res.status(403).json({ message: "모임장만 삭제 가능합니다." });
+				return res.status(403).json({ message: '모임장만 삭제 가능합니다.' });
 			}
 
 			await prisma.community.delete({
@@ -116,7 +116,7 @@ router.post(
 		const User = await prisma.communityUsers.findFirst({
 			where: {
 				userId: +id,
-				communityId : +communityId,
+				communityId: +communityId,
 			},
 		});
 		if (User) {
@@ -162,6 +162,7 @@ router.get('/community/post/:communityId', async (req, res, next) => {
 		const posts = await prisma.posts.findMany({
 			where: {
 				communityId: +communityId,
+				isComment: false,
 			},
 			select: {
 				id: true,
@@ -174,6 +175,9 @@ router.get('/community/post/:communityId', async (req, res, next) => {
 					select: {
 						name: true,
 					},
+				},
+				_count: {
+					select: { Likes: true },
 				},
 			},
 		});
@@ -190,9 +194,7 @@ router.get('/postlike', async (req, res, next) => {
 	try {
 		const postlike = await prisma.posts.findMany({
 			where: {
-				parentsId: {
-					gt: 0,
-				},
+				isComment: false,
 			},
 			select: {
 				id: true,
@@ -200,6 +202,9 @@ router.get('/postlike', async (req, res, next) => {
 				content: true,
 				parentsId: true,
 				createdAt: true,
+				_count: {
+					select: { Likes: true },
+				},
 			},
 			orderBy: {
 				createdAt: 'desc',

@@ -43,17 +43,6 @@ router.post('/like/:postId', authMiddleWare, async (req, res, next) => {
 					postId: +postId,
 				},
 			});
-
-			const undatedParentsId = Findpost.parentsId + 1;
-			console.log(Findpost.parentsId, undatedParentsId);
-			await prisma.posts.update({
-				where: {
-					id: +postId,
-				},
-				data: {
-					parentsId: undatedParentsId,
-				},
-			});
 		} else {
 			return res
 				.status(403)
@@ -88,15 +77,6 @@ router.delete('/like/:postId', authMiddleWare, async (req, res, next) => {
 		if (like) {
 			await prisma.likes.delete({
 				where: { id: like.id },
-			});
-			const undatedParentsId = Findpost.parentsId - 1;
-			await prisma.posts.update({
-				where: {
-					id: +postId,
-				},
-				data: {
-					parentsId: undatedParentsId,
-				},
 			});
 		} else {
 			return res.status(404).json({ message: '좋아요 기록이 없습니다.' });

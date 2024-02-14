@@ -36,7 +36,7 @@ model Posts {
   title     String      @map("title")
   content   String      @map("content")
   createdAt DateTime    @default(now()) @map("createdAt")
-  updatedAt DateTime    @default(now()) @map("updatedAt")
+  updatedAt DateTime     @updatedAt @map("updatedAt")
   isComment Boolean     @default(false) @map("isComment")
 
   user Users @relation(fields:[userId], references: [id] , onDelete: Cascade)
