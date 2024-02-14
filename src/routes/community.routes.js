@@ -212,24 +212,6 @@ router.get('/postlike', async (req, res, next) => {
 				createdAt: 'desc',
 			},
 		});
-
-		//표시할 글이 없을 경우 최신순으로 게시글 조회
-		if (postlike.length === 0) {
-			const post = await prisma.posts.findMany({
-				select: {
-					id: true,
-					title: true,
-					content: true,
-					parentsId: true,
-					createdAt: true,
-				},
-				orderBy: {
-					createdAt: 'desc',
-				},
-			});
-			return res.status(200).json({ data: post });
-		}
-
 		return res.status(200).json({ data: postlike });
 	} catch (err) {
 		next(err);

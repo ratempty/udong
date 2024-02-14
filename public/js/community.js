@@ -19,7 +19,6 @@ export async function bringCommunity() {
 				const nav = document.querySelector('.nav-images');
 				const newDiv = document.createElement('div');
 				const newImg = document.createElement('img');
-				newImg.src = `./image/image${i}.png`;
 				newImg.alt = data.data[i].comName;
 
 				newDiv.appendChild(newImg);
@@ -79,24 +78,29 @@ async function getCommunityPosts() {
 					'Content-Type': 'application/json',
 				},
 			});
-
+			if (!response.ok) {
+				const main = document.querySelector('.main');
+				main.innerHTML += '<div class="wrapper">글이 없습니다.</div>';
+				return;
+			}
 			const data = await response.json();
 			const sortedData =
 				data?.data?.sort(
 					(a, b) => new Date(a.createdAt) - new Date(b.createdAt),
 				) ?? [];
-
 			const main = document.querySelector('.main');
-			for (let i = 0; i < sortedData.length; i++) {
-				const title = sortedData[i].title;
-				const content = sortedData[i].content;
-				const wrapper = `
-					<div class="wrapper">
-						<p class="postTitle">${title}</p>
-						<p class="postContent">${content}</p>
-					</div>
-				`;
-				main.innerHTML += wrapper;
+			if (sortedData.length > 0) {
+				for (let i = 0; i < sortedData.length; i++) {
+					const title = sortedData[i].title;
+					const content = sortedData[i].content;
+					const wrapper = `
+									<div class="wrapper">
+											<p class="postTitle">${title}</p>
+											<p class="postContent">${content}</p>
+									</div>
+							`;
+					main.innerHTML += wrapper;
+				}
 			}
 		}
 	} catch (error) {
@@ -113,27 +117,34 @@ async function makePost() {
 		const currentUrl = window.location.href;
 		const urlParams = new URLSearchParams(new URL(currentUrl).search);
 		const id = urlParams.get('id');
+		if (id) {
+			document
+				.querySelector('#postForm')
+				.addEventListener('submit', async function (e) {
+					e.preventDefault();
 
-		document
-			.querySelector('#postForm')
-			.addEventListener('submit', async function (e) {
-				e.preventDefault();
-				const formData = new FormData(this);
-				for (const x of formData) {
-					console.log(x);
-				}
-				try {
-					const response = await fetch(`/api/community/${id}`, {
-						method: 'POST',
-						body: formData,
-					});
-				} catch (error) {
-					console.log('서버 요청 중 오류:', error);
-				}
-			});
+					const formData = new FormData(this);
+
+					for (const x of formData) {
+						console.log(x);
+					}
+					try {
+						const response = await fetch(`/api/community/${id}`, {
+							method: 'POST',
+							body: formData,
+						});
+					} catch (error) {
+						console.log('서버 요청 중 오류:', error);
+					}
+				});
+		}
 	} catch (error) {
 		console.log('처리 중 오류:', error);
 	}
 }
 
 makePost();
+
+document.querySelector('#logo').addEventListener('click', () => {
+	window.location.href = 'http://udong.store:3000/';
+});

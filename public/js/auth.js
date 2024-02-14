@@ -214,7 +214,7 @@ export function myInfoListener(options = {}) {
 				});
 		});
 }
-function populateUserInfo(userInfo, options = {}) {
+async function populateUserInfo(userInfo, options = {}) {
 	const {
 		emailSelector = 'user-email',
 		nameSelector = 'user-name',
@@ -228,6 +228,7 @@ function populateUserInfo(userInfo, options = {}) {
 	if (document.getElementById(emailSelector)) {
 		document.getElementById(emailSelector).value = userInfo.email || '';
 	}
+
 	document.getElementById(nameSelector).value = userInfo.name;
 	document.getElementById(interestSelector).value = userInfo.interest || '';
 
@@ -264,9 +265,6 @@ export function chkLogin() {
 				setupUserInfoForm();
 			}
 			return response.json();
-		})
-		.then((data) => {
-			console.log('사용자 정보:', data);
 		})
 		.catch((error) => {
 			console.log(error.message);

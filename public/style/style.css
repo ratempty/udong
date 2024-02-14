@@ -1,5 +1,6 @@
 body {
 	font-family: Arial, sans-serif;
+	padding: 20px;
 }
 
 header,
@@ -13,7 +14,7 @@ footer {
 	float: left;
 }
 .header-left img {
-	max-width: 35px;
+	max-width: 100px;
 }
 .header-right {
 	float: right;
@@ -254,4 +255,11 @@ footer {
 
 .hidden {
 	display: none;
+}
+
+#content-ground div {
+	border-bottom: 1px solid #ccc;
+	margin-bottom: 20px;
+	line-height: 1.8em;
+	padding-left: 15px;
 }

@@ -20,17 +20,16 @@ export function displayData(posts) {
 	if (postContainer && posts) {
 		posts.forEach((post) => {
 			const postElement = document.createElement('div');
-			postElement.innerHTML = `
-		   
+			if (post._count.Likes !== 0) {
+				postElement.innerHTML = `
 				<h2>${post.title}</h2>
 				<p>${post.content}</p>
 				<p>좋아요 수: ${post._count.Likes}</p>
 				<p>작성일자: ${post.createdAt}</p>
-				<hr>
 			`;
 
-			postContainer.appendChild(postElement);
-			console.log(postElement);
+				postContainer.appendChild(postElement);
+			}
 		});
 	}
 }

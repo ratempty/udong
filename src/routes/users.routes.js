@@ -19,7 +19,7 @@ router.post('/email', async (req, res, next) => {
 	if (!user.isVerified) {
 		const verifyToken = createVerifyToken(user.email);
 		res.cookie('verification', `Bearer ${verifyToken}`);
-		await emailSender(email, verifyToken);
+		emailSender(email, verifyToken);
 		try {
 			res.json({
 				ok: true,
@@ -77,7 +77,7 @@ router.post(
 				.json({ message: `${name}님 회원가입을 축하합니다.` });
 		} catch (err) {
 			console.error('업로드 중 에러 발생:', error.message);
-			res.status(500).send(error.message);
+			res.status(500).send(err.message);
 		}
 	},
 );
@@ -138,6 +138,7 @@ router.get('/users', authMiddleWare, async (req, res, next) => {
 		where: { id: +loginId },
 		select: {
 			name: true,
+			password: true,
 			email: true,
 			interest: true,
 			profileImage: true,
@@ -193,8 +194,9 @@ router.patch(
 	uploadMiddleWare.single('profileImage'),
 	async (req, res, next) => {
 		const loginId = req.user.id;
-		const { name, email, interest } = req.body;
+		const { name, email, interest, pw: password } = req.body;
 		const profileImage = req.file ? req.file.location : null;
+		let hashedPassword = '';
 
 		try {
 			const existUser = await prisma.users.findUnique({
@@ -205,7 +207,11 @@ router.patch(
 				return res.status(404).json({ message: '존재하지 않는 유저입니다.' });
 			}
 
-			if (existUser && existUser.profileImage) {
+			if (password) {
+				hashedPassword = await bcrypt.hash(password, 10);
+			}
+			console.log(hashedPassword);
+			if (profileImage && existUser.profileImage) {
 				let existingImage = existUser.profileImage.replace(
 					process.env.AWS_LOCATION,
 					'',
@@ -217,6 +223,7 @@ router.patch(
 				where: { id: +loginId },
 				data: {
 					...(name && { name }),
+					...(password && { password: hashedPassword }),
 					...(email && { email }),
 					...(interest && { interest }),
 					...(profileImage && { profileImage: profileImage }),
