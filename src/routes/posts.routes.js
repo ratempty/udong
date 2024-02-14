@@ -1,13 +1,12 @@
 import express from 'express';
 import { prisma } from '../utils/index.js';
-import jwt from 'jsonwebtoken';
 import authMiddleware from '../middleware/auth.middleware.js';
 
 const router = express.Router();
 
 //게시글 등록
 router.post(
-	'/community/:communityId',
+	'/community/post/:communityId',
 	authMiddleware,
 	async (req, res, next) => {
 		const { communityId } = req.params;
@@ -41,41 +40,47 @@ router.post(
 );
 
 // 게시글 수정
-router.patch('/community/:postId', authMiddleware, async (req, res, next) => {
-	const { postId } = req.params;
-	const userId = req.user;
-	const { title, content } = req.body;
+router.patch(
+	'/community/post/:postId',
+	authMiddleware,
+	async (req, res, next) => {
+		const { postId } = req.params;
+		const userId = req.user;
+		const { title, content } = req.body;
 
-	// 자기 글인지 확인
-	const isMyPost = await prisma.posts.findFirst({
-		where: {
-			id: +postId,
-		},
-		select: {
-			userId: true,
-		},
-	});
+		// 자기 글인지 확인
+		const isMyPost = await prisma.posts.findFirst({
+			where: {
+				id: +postId,
+			},
+			select: {
+				userId: true,
+			},
+		});
 
-	if (!isMyPost) {
-		return res.status(404).json({ message: '해당 글을 찾을 수 없습니다.' });
-	}
-	console.log(userId.id, isMyPost.userId);
-	if (isMyPost.userId !== userId.id) {
-		return res.status(403).json({ message: '본인의 글만 수정할 수 있습니다.' });
-	}
+		if (!isMyPost) {
+			return res.status(404).json({ message: '해당 글을 찾을 수 없습니다.' });
+		}
+		console.log(userId.id, isMyPost.userId);
+		if (isMyPost.userId !== userId.id) {
+			return res
+				.status(403)
+				.json({ message: '본인의 글만 수정할 수 있습니다.' });
+		}
 
-	const updatePost = await prisma.posts.update({
-		where: {
-			id: +postId,
-			userId: +userId.id,
-		},
-		data: {
-			title: title,
-			content: content,
-		},
-	});
-	return res.status(200).json({ message: '수정 완료' });
-});
+		const updatePost = await prisma.posts.update({
+			where: {
+				id: +postId,
+				userId: +userId.id,
+			},
+			data: {
+				title: title,
+				content: content,
+			},
+		});
+		return res.status(200).json({ message: '수정 완료' });
+	},
+);
 
 // 게시글 삭제
 //localhost:3000/api/:communityId/:postId
@@ -238,7 +243,7 @@ router.patch('/comment/:postId', authMiddleware, async (req, res, next) => {
 /**
  * 댓글 조회
  */
-router.get('/comment/:parentsId', authMiddleware, async (req, res, next) => {
+router.get('/comment/:parentsId', async (req, res, next) => {
 	const { orderKey, orderValue } = req.query;
 	const validOrderValue =
 		orderValue && orderValue.toUpperCase() === 'ASC' ? 'asc' : 'desc';

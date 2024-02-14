@@ -68,10 +68,6 @@ router.delete(
 				.json({ message: '잘못된 접근입니다. (삭제할 모임 확인 불가)' });
 		}
 
-		if (!loginId) {
-			return res.status(401).json({ message: '로그인하세요.' });
-		}
-
 		try {
 			const existingCommunity = await prisma.community.findFirst({
 				where: { id: +communityId },
